@@ -42,62 +42,64 @@ NovaCRM is inspired by the **clean, minimal, and premium aesthetic of Apple hard
 ## 🚀 Key Modules & System Architecture
 
 ```
-NovaCRM Dashboard
-├── 1. Operations Command Center (Dual-Mode Telemetry & KPI Cards)
-├── 2. 357 Contact Directory & Lead CRM (CSV Export Engine)
-├── 3. Movie Catalog & Showtime Scheduler (Conflict Detection)
-├── 4. Live Box Office & Seat Matrix (Printable Barcode Ticket Stubs)
-├── 5. Customer CRM & Loyalty Drawer (VIP Tiers & Visit Telemetry)
-├── 6. Reservations Ledger & Refund Desk (Instant Seat Release)
-└── 7. System Settings & LocalStorage Backup (JSON Export/Import)
+NovaCRM Cinema Enterprise Platform
+├── 1. Dashboard (KPI Cards, Dual-Mode Revenue Chart, Ticket Sales, Recent Bookings, Popular Movies)
+├── 2. Movie Management (Posters, Titles, Genres, Durations, Release Dates, Add/Edit/Delete Actions)
+├── 3. Showtime Management (Movie/Theatre/Screen/Date/Time Selector, Pricing, Collision Engine)
+├── 4. Booking Management (Booking ID, Customer Name, Movie, Seats, Amount, Payment, Cancellation)
+├── 5. Theatre & Screen Management (Locations, Screen Names, Seating Capacities, Availability Badges)
+├── 6. Customer Management (Customer List, Contact Details, Booking History, Account Statuses)
+├── 7. Profile & Settings (Marcus Vance Profile, Security Password Rotation, Notification Switches)
+└── 8. Live Box Office & Seat Matrix (Interactive Real-time Seat Picker & Printable Ticket Pass)
 ```
 
-### 1. Operations Command Center (Dual-View Telemetry)
-- **Top 4 KPI Metric Cards**:
-  - **Active Deals**: `86` (`↗ 37%` orange pill badge).
-  - **Pipeline Value**: `$412,800` (`↗ Potential revenue` green pill badge).
-  - **Deals Won (This Month)**: `18` (`↘ vs last month` yellow pill badge, `+22%` growth).
-  - **Conversion Rate**: `34%` with custom red trend curve sparkline.
-- **Interactive Dual-View Segmented Switcher**:
-  - **Photo 1 View**:
-    - **Total Sales**: 7-day straight-segment line graph (Mon–Sun) with glowing orange node markers and green badge (`$15,039`).
-    - **Sales Activity**: 180° semi-circular gauge chart (30% Yellow, 60% Mint, 10% Purple) with interactive channel filters (`WhatsApp`, `Chat`, `Email`).
-  - **Photo 2 View**:
-    - **Closed Revenue in 30 Days**: Smooth bell-curve area wave chart with glowing orange gradient and `Won 68%` apex marker.
-    - **Top Deal Sources**: 3 vertical rounded capsule bars (Website 100%, Ads 160%, Referrals 140%) with Y-axis percentage guides.
-    - **Sales Rep Performance**: Progress meters for Sarah (`$54,200`), John (`$38,600`), and Marcus (`$45,100`).
+### 1. Dashboard
+- **Executive KPI Cards**: Real-time telemetry for Active Screenings & Deals (86), Pipeline Value ($412,800), Deals Won (18), and Conversion Rate (34%).
+- **Interactive Revenue Charts**: 
+  - **Photo 1 View**: 7-day straight-segment line chart with node markers ($15,039) and Sales Activity semi-circular gauge.
+  - **Photo 2 View**: 30-day closed revenue bell-curve area chart, vertical capsule deal source bars, and sales rep performance meters.
+- **Recent Bookings Telemetry**: Dynamic live feed of incoming reservations (`#overview-recent-bookings-list`).
+- **Popular Movies Telemetry**: Box office occupancy and sales volume leaderboard (`#overview-popular-movies-list`).
 
-### 2. 357 Contact Directory & Lead Ticker
-- **Live Search & Filter**: Instant candidate search across Name, Email, and Company.
-- **Role Segmentation**: Filter between All Roles, VIP Patrons, Corporate Clients, and Loyalty Members.
-- **One-Click CSV Export**: Downloads cleanly formatted `.csv` reports for accounting.
-- **Lead Ticker**: Bottom marquee featuring high-value bookings (*Pixel Studio* — `$4,500`).
-- **Profile Connection**: Clicking `See Detail →` on any contact slides open their full cinema CRM history.
+### 2. Movie Management
+- **Feature Film Rotation**: Visual movie catalog with posters, titles, genres, runtimes, release dates, age ratings (PG-13, R, PG, G, NC-17), and base ticket prices.
+- **Search & Filter**: Real-time filtering by keyword and status (`Active Rotation`, `Coming Soon`, `Archived`).
+- **View Toggle**: Switch between responsive 3-column Poster Grid and dense Tabular Ledger.
+- **CRUD Operations**: Complete modal forms to Add new movies, Edit existing film details, and safely Delete archived titles.
 
-### 3. Movie Catalog & Showtime Scheduler
-- **Film Rotation Management**: View active films, duration, director, rating (PG-13, R), and base admission prices.
-- **Conflict Engine**: Prevents double-booking screenings in the same screen auditorium slot with real-time collision alerts.
-- **Screen Filtering**: Switch between Screen 1 (IMAX Laser), Screen 2 (Dolby Atmos), and Screen 3 (Luxe Recliners).
+### 3. Showtime Management
+- **Screening Scheduler**: Schedule showtimes by selecting Movie, Theatre Location, Auditorium Screen, Screening Date, and Start Time.
+- **Collision-Free Conflict Engine**: Automatically enforces duration buffers + 20-minute turnaround cleaning times to prevent auditorium scheduling clashes.
+- **Dynamic Pricing Multipliers**: Standard Base (1.0x), Evening Peak (1.1x), IMAX Laser (1.15x), and VIP Weekend (1.2x).
+- **Seat Matrix Direct Link**: One-click jump into any showtime's live seat matrix.
 
-### 4. Live Box Office & Real-Time Seat Matrix
-- **Curved Soundstage Projection Screen**: Visual curved cinema screen with ambient light beam effects.
-- **Interactive Seat Matrix**:
-  - **VIP Recliners** (Rows A-B): `$22.00`
-  - **Standard Premium** (Rows C-G): `$16.50`
-  - **Accessible Rows** (Row H): `$15.00`
-- **Instant Booking Engine**: Multi-seat selection, tax and booking fee breakdown, and POS payment method selector.
-- **Digital Ticket Stubs**: Generates printable cinema ticket stubs with simulated linear barcodes and notch punchouts.
+### 4. Booking Management
+- **Transaction Ledger**: Complete audit log with Booking ID, Customer Name & Loyalty Tier, Movie, Auditorium & Slot, Seat Numbers, Total Amount Paid, and Payment Method.
+- **Booking Statuses**: Real-time badge indicators for `Confirmed` vs `Cancelled / Refunded`.
+- **Digital Pass Modal**: Instant preview and physical printing of formatted cinema ticket passes with barcodes and security notches.
+- **Desk Cancellation & Refund Desk**: One-click cancellation with immediate release of reserved seats back to available inventory.
 
-### 5. Customer CRM & Loyalty Engine
-- **VIP Tier System**: Bronze, Silver, Gold, and Platinum tiers.
-- **Telemetry**: Tracks lifetime spend, reward points, visit counters, preferred genres, and personalized seating notes.
+### 5. Theatre & Screen Management
+- **Theatre Locations Overview**: Multi-complex cards for Downtown Complex and Uptown Luxe Promenade.
+- **Auditoriums & Seating Capacity**: Detailed breakdown of VIP Recliners, Standard Seats, Accessible Seats, and Total Capacity.
+- **Live Availability Badges**: `Available`, `Maintenance`, and `Cleaning` with quick-status dropdown selector.
+- **Screen Creator**: Add new screens or reconfigure sound & projection specs (IMAX Laser, Dolby Atmos, Luxe Recliner, Standard 4K).
 
-### 6. Reservations Ledger & Refund Desk
-- **Audited Transaction History**: Searchable bookings ledger with customer details, assigned seats, and timestamps.
-- **Instant Seat Release**: Issue full refunds with one click; immediately releases reserved seats back to the live seat matrix.
+### 6. Customer Management
+- **Patron Directory**: Complete customer profiles with Name, Email, Phone, Loyalty Tier (Platinum, Gold, Silver, Bronze), and Account Status (`Active`, `VIP Member`, `Suspended`).
+- **Status Selector**: Quick account status updates directly from table rows.
+- **Slide-Over Profile Drawer**: Inspect customer visit counters, lifetime spend, reward points, staff notes, preferred genres, and individual booking history.
 
-### 7. Dual Theme Engine (Dark & Light)
-- **Matte Obsidian Dark Mode**: Inspired by minimal developer tools and luxury OLED hardware interfaces.
+### 7. Profile & Settings
+- **Administrator Profile**: Dedicated profile for Marcus Vance (Full Name, Email, Phone, Role, Complex, Department, Avatar).
+- **Security & Password Rotation**: Protected password change workflow with confirmation validation.
+- **Operational Notification Preferences**: Interactive luxury toggle switches for High-Value Booking Alerts, Low Seat Capacity Warnings, Refund Alerts, Daily Digest, and Audio Chimes.
+- **Cinema Configuration & Database Backup**: Custom tax rates, booking fees, JSON export backup, and restore utilities.
+
+### 8. Live Box Office & Real-Time Seat Matrix
+- **Curved Soundstage Screen**: Realistic curved projection beam canvas.
+- **Interactive Seat Map**: Color-coded VIP Recliners ($22), Standard Seats ($16.50), Accessible Seats ($15), Selected Seats, and Occupied Seats.
+- **POS Checkout**: Cart summary, customer loyalty assignment, tax calculations, and instant ticket pass generation.
 - **Porcelain Light Mode**: Ultra-clean, high-contrast alabaster cards with hairline borders and adaptive chart scales.
 - **Automatic Persistence**: Saved to `localStorage.getItem('novacrm_theme')` across browser restarts.
 

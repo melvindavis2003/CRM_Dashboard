@@ -41,11 +41,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- VIEW ROUTER ---
   function switchView(viewName) {
-    AppState.currentView = viewName;
+    // Aliases normalization
+    let targetView = viewName;
+    if (viewName === "reservations") targetView = "bookings";
+    if (viewName === "crm") targetView = "customers";
+
+    AppState.currentView = targetView;
 
     // Update navigation active states
     document.querySelectorAll(".nav-link").forEach(link => {
-      if (link.dataset.view === viewName) {
+      const linkView = link.dataset.view;
+      const isMatch = linkView === targetView || 
+        (linkView === "bookings" && targetView === "reservations") ||
+        (linkView === "customers" && targetView === "crm");
+      if (isMatch) {
         link.classList.add("bg-[#24242a]", "text-white");
         link.classList.remove("text-[#85858f]", "hover:bg-[#1c1c21]");
       } else {
@@ -59,58 +68,80 @@ document.addEventListener("DOMContentLoaded", () => {
       el.classList.add("hidden");
     });
 
-    const activeContainer = document.getElementById(`view-${viewName}`);
+    const activeContainer = document.getElementById(`view-${targetView}`);
     if (activeContainer) {
       activeContainer.classList.remove("hidden");
     }
 
     // Update Header Breadcrumbs & Titles
     const titleMap = {
-      overview: { title: "Operations Command Center", subtitle: "Real-time ticketing & CRM telemetry" },
-      movies: { title: "Movie Catalog & Showtime Scheduler", subtitle: "Auditorium scheduling, conflict engine & film metadata" },
-      boxoffice: { title: "Live Box Office & Seat Matrix", subtitle: "Real-time seat allocation & instant digital ticket issuance" },
-      crm: { title: "Customer CRM & Loyalty Directory", subtitle: "VIP tier management, points tracking & guest history" },
-      reservations: { title: "Reservations Ledger & Refund Desk", subtitle: "Audited transaction history & instant seat release engine" },
-      settings: { title: "System Configuration & Database Backup", subtitle: "Theater parameters, tax settings & JSON state recovery" }
+      overview: { title: "Dashboard", subtitle: "Statistics, revenue chart, ticket sales, recent bookings & popular movies" },
+      movies: { title: "Movie Management", subtitle: "Movie posters, titles, genres, duration, release dates & actions" },
+      showtimes: { title: "Showtime Management", subtitle: "Select movies, theatres, screens, dates, times, and ticket prices" },
+      bookings: { title: "Booking Management", subtitle: "Booking ID, customer name, movie, seats, amount, payment status & cancellation" },
+      reservations: { title: "Booking Management", subtitle: "Booking ID, customer name, movie, seats, amount, payment status & cancellation" },
+      theatres: { title: "Theatre & Screen Management", subtitle: "Theatre locations, screen names, seating capacity & screen availability" },
+      customers: { title: "Customer Management", subtitle: "Customer list, contact details, booking history & account status" },
+      crm: { title: "Customer Management", subtitle: "Customer list, contact details, booking history & account status" },
+      settings: { title: "Profile & Settings", subtitle: "Admin profile, account details, password change & notification preferences" },
+      boxoffice: { title: "Live Box Office & Seat Matrix", subtitle: "Real-time interactive auditorium seat map & digital pass issuance" }
     };
 
     const titleEl = document.getElementById("topbar-view-title");
     const subtitleEl = document.getElementById("topbar-view-subtitle");
-    if (titleEl && titleMap[viewName]) {
-      titleEl.innerHTML = `${titleMap[viewName].title} <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>`;
+    if (titleEl && titleMap[targetView]) {
+      titleEl.innerHTML = `${titleMap[targetView].title} <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>`;
     }
-    if (subtitleEl && titleMap[viewName]) {
-      subtitleEl.textContent = titleMap[viewName].subtitle;
+    if (subtitleEl && titleMap[targetView]) {
+      subtitleEl.textContent = titleMap[targetView].subtitle;
     }
 
     updateHeaderPills();
 
     // Render corresponding view data
-    switch (viewName) {
+    switch (targetView) {
       case "overview":
         renderOverview();
         break;
       case "movies":
         renderMoviesCatalog();
+        break;
+      case "showtimes":
         renderShowtimesSchedule();
         break;
-      case "boxoffice":
-        renderBoxOffice();
-        break;
-      case "crm":
-        renderCustomerCRM();
-        break;
+      case "bookings":
       case "reservations":
         renderReservationsLedger();
         break;
+      case "theatres":
+        renderTheatresAndScreens();
+        break;
+      case "customers":
+      case "crm":
+        renderCustomerCRM();
+        break;
       case "settings":
         renderSettingsView();
+        break;
+      case "boxoffice":
+        renderBoxOffice();
         break;
     }
 
     // Refresh icons
     setTimeout(() => lucide.createIcons(), 50);
   }
+
+  // Expose global actions
+  window.switchView = switchView;
+  window.openAddMovieModal = () => openAddMovieModal();
+  window.openEditMovieModal = (id) => openEditMovieModal(id);
+  window.openAddShowtimeModal = (id) => openAddShowtimeModal(id);
+  window.openAddScreenModal = () => openAddScreenModal();
+  window.openEditScreenModal = (id) => openEditScreenModal(id);
+  window.openCustomerProfileDrawer = (id) => openCustomerProfileDrawer(id);
+  window.showTicketStubModal = (id) => showTicketStubModal(id);
+  window.openRefundModal = (id) => openRefundModal(id);
 
   function updateHeaderPills() {
     const summary = Store.getAnalyticsSummary();
@@ -421,11 +452,83 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. Charts Initialization (Photo 1 & Photo 2)
     renderOverviewCharts();
 
-    // 3. Render 357 Contact / CRM table
+    // 3. Telemetry Widgets: Recent Bookings & Popular Movies
+    renderOverviewRecentBookings();
+    renderOverviewPopularMovies();
+
+    // 4. Render 357 Contact / CRM table
     renderOverviewContactsTable();
 
-    // 4. Bind view toggle and table filters
+    // 5. Bind view toggle and table filters
     setupOverviewInteractions();
+  }
+
+  function renderOverviewRecentBookings() {
+    const container = document.getElementById("overview-recent-bookings-list");
+    if (!container) return;
+    const recents = Store.getRecentBookings(4);
+    if (recents.length === 0) {
+      container.innerHTML = `<div class="p-6 text-center text-xs text-[#85858f]">No bookings recorded yet.</div>`;
+      return;
+    }
+    container.innerHTML = recents.map(r => `
+      <div class="p-3 rounded-xl bg-[#222227] hover:bg-[#282830] border border-[rgba(255,255,255,0.04)] flex items-center justify-between transition text-xs">
+        <div class="flex items-center gap-3">
+          <img src="${r.customerAvatar}" class="w-8 h-8 rounded-full object-cover border border-[rgba(255,255,255,0.1)]" alt="${escapeHtml(r.customerName)}" />
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-semibold text-white">${escapeHtml(r.customerName)}</span>
+              <span class="font-mono text-[10px] text-novaOrange">#${escapeHtml(r.id)}</span>
+            </div>
+            <p class="text-[11px] text-[#85858f] mt-0.5 truncate max-w-[200px]">${escapeHtml(r.movieTitle)} • Seats: <span class="font-mono text-white">${r.seats.join(", ")}</span></p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="text-right">
+            <span class="font-mono font-bold text-white text-xs">$${r.totalAmount.toFixed(2)}</span>
+            <span class="block text-[10px] ${r.paymentStatus === 'Refunded' ? 'text-rose-400' : 'text-[#4ade80]'} font-medium">${r.paymentStatus}</span>
+          </div>
+          <button onclick="showTicketStubModal('${r.id}')" class="p-1.5 rounded-lg bg-[#1c1c21] hover:bg-[#2e2e38] text-[#85858f] hover:text-white transition" title="View Digital Ticket Stub">
+            <i data-lucide="ticket" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+    `).join("");
+    lucide.createIcons();
+  }
+
+  function renderOverviewPopularMovies() {
+    const container = document.getElementById("overview-popular-movies-list");
+    if (!container) return;
+    const popular = Store.getPopularMovies(4);
+    container.innerHTML = popular.map(m => `
+      <div class="p-3 rounded-xl bg-[#222227] hover:bg-[#282830] border border-[rgba(255,255,255,0.04)] flex items-center justify-between transition text-xs">
+        <div class="flex items-center gap-3">
+          <img src="${m.poster}" class="w-9 h-12 rounded-lg object-cover shadow-sm bg-[#18191d]" alt="${escapeHtml(m.title)}" />
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-bold text-white">${escapeHtml(m.title)}</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-[#ff5d2a]/15 text-novaOrange font-semibold">${m.genre.split('/')[0].trim()}</span>
+            </div>
+            <div class="flex items-center gap-2 text-[11px] text-[#85858f] mt-1">
+              <span>${m.ticketsSold.toLocaleString()} tickets sold</span>
+              <span>•</span>
+              <span class="font-mono text-white font-medium">$${m.revenue.toLocaleString()}</span>
+            </div>
+          </div>
+        </div>
+        <div class="w-24 text-right">
+          <div class="flex justify-between text-[10px] mb-1 font-mono">
+            <span class="text-[#85858f]">Occupancy</span>
+            <span class="text-white font-bold">${m.occupancy}%</span>
+          </div>
+          <div class="w-full h-2 bg-[#17181c] rounded-full overflow-hidden p-0.5">
+            <div class="h-full bg-novaOrange rounded-full" style="width: ${m.occupancy}%"></div>
+          </div>
+        </div>
+      </div>
+    `).join("");
+    lucide.createIcons();
   }
 
   function renderOverviewCharts() {
@@ -928,10 +1031,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==========================================================================
-  // MODULE C: MOVIES & SHOWTIME SCHEDULER
+  // ==========================================================================
+  // MODULE C: MOVIE MANAGEMENT (PAGE 2)
   // ==========================================================================
   let movieViewMode = "grid"; // 'grid' or 'table'
   let movieSearchFilter = "";
+  let movieStatusFilter = "all";
 
   function renderMoviesCatalog() {
     const container = document.getElementById("movies-catalog-container");
@@ -940,50 +1045,77 @@ document.addEventListener("DOMContentLoaded", () => {
     let movies = Store.getMovies();
     if (movieSearchFilter) {
       const q = movieSearchFilter.toLowerCase();
-      movies = movies.filter(m => m.title.toLowerCase().includes(q) || m.genre.toLowerCase().includes(q));
+      movies = movies.filter(m => 
+        m.title.toLowerCase().includes(q) || 
+        m.genre.toLowerCase().includes(q) ||
+        (m.director && m.director.toLowerCase().includes(q))
+      );
+    }
+
+    if (movieStatusFilter && movieStatusFilter !== "all") {
+      movies = movies.filter(m => m.status === movieStatusFilter);
+    }
+
+    if (movies.length === 0) {
+      container.innerHTML = `
+        <div class="p-12 text-center text-[#85858f] text-xs nova-card">
+          <i data-lucide="film" class="w-8 h-8 text-[#6b6c77] mx-auto mb-2 opacity-50"></i>
+          <p>No films match your search or status filter.</p>
+        </div>
+      `;
+      lucide.createIcons();
+      return;
     }
 
     if (movieViewMode === "grid") {
       container.innerHTML = `
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           ${movies.map(m => `
-            <div class="card-cinema rounded-2xl overflow-hidden flex flex-col group hover:border-slate-700 transition">
-              <div class="relative h-64 overflow-hidden bg-slate-900">
-                <img src="${m.poster}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+            <div class="nova-card rounded-2xl overflow-hidden flex flex-col group hover:border-[rgba(255,93,42,0.4)] transition">
+              <div class="relative h-64 overflow-hidden bg-[#18191d]">
+                <img src="${m.poster}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="${escapeHtml(m.title)}" />
+                <div class="absolute inset-0 bg-gradient-to-t from-[#101114] via-transparent to-transparent"></div>
+                
                 <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${m.status === 'Active' ? 'bg-emerald-500/90 text-slate-950' : 'bg-slate-700 text-slate-300'}">
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${m.status === 'Active' ? 'bg-[#22c55e]/90 text-black' : m.status === 'Coming Soon' ? 'bg-amber-400 text-black' : 'bg-[#222227] text-[#85858f] border border-[rgba(255,255,255,0.06)]'}">
                     ${m.status}
                   </span>
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-900/80 text-amber-400 backdrop-blur-sm border border-slate-700/80">
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#101114]/80 text-novaOrange backdrop-blur-sm border border-[rgba(255,255,255,0.08)]">
                     ${m.rating}
                   </span>
                 </div>
-                <div class="absolute bottom-2.5 left-2.5 right-2.5">
-                  <h3 class="font-bold text-white text-base leading-tight drop-shadow-md">${escapeHtml(m.title)}</h3>
-                  <p class="text-xs text-slate-300 mt-0.5">${escapeHtml(m.genre)}</p>
+
+                <div class="absolute bottom-2.5 left-3 right-3">
+                  <h3 class="font-bold text-white text-base leading-tight drop-shadow-md truncate">${escapeHtml(m.title)}</h3>
+                  <p class="text-xs text-[#a0a0ab] mt-0.5">${escapeHtml(m.genre)}</p>
                 </div>
               </div>
-              <div class="p-3.5 flex-1 flex flex-col justify-between bg-slate-900/80">
-                <div class="grid grid-cols-2 gap-2 text-xs text-slate-400 pb-3 border-b border-slate-800">
+
+              <div class="p-4 flex-1 flex flex-col justify-between bg-[#1c1c21] space-y-3">
+                <div class="grid grid-cols-3 gap-2 text-xs pb-3 border-b border-[rgba(255,255,255,0.05)]">
                   <div>
-                    <span class="text-[10px] uppercase text-slate-500">Duration</span>
-                    <p class="font-medium text-slate-200">${m.duration} mins</p>
+                    <span class="text-[10px] uppercase text-[#6b6c77] block">Duration</span>
+                    <p class="font-semibold text-white mt-0.5">${m.duration}m</p>
                   </div>
                   <div>
-                    <span class="text-[10px] uppercase text-slate-500">Base Price</span>
-                    <p class="font-medium text-amber-400">$${m.basePrice.toFixed(2)}</p>
+                    <span class="text-[10px] uppercase text-[#6b6c77] block">Release</span>
+                    <p class="font-semibold text-white mt-0.5 truncate">${m.releaseDate || 'In Rotation'}</p>
+                  </div>
+                  <div>
+                    <span class="text-[10px] uppercase text-[#6b6c77] block">Base Ticket</span>
+                    <p class="font-semibold text-novaOrange mt-0.5 font-mono">$${m.basePrice.toFixed(2)}</p>
                   </div>
                 </div>
-                <div class="flex items-center gap-2 pt-3">
-                  <button class="flex-1 py-1.5 px-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-semibold transition flex items-center justify-center gap-1 btn-movie-add-showtime" data-id="${m.id}">
+
+                <div class="flex items-center gap-2 pt-1">
+                  <button class="flex-1 py-1.5 px-2 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white text-xs font-semibold transition flex items-center justify-center gap-1 btn-movie-add-showtime shadow-sm" data-id="${m.id}">
                     <i data-lucide="calendar-plus" class="w-3.5 h-3.5"></i>
                     <span>Schedule</span>
                   </button>
-                  <button class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition btn-edit-movie" data-id="${m.id}" title="Edit Movie">
+                  <button class="p-2 rounded-xl bg-[#222227] hover:bg-[#2c2c34] text-[#85858f] hover:text-white text-xs transition btn-edit-movie" data-id="${m.id}" title="Edit Movie">
                     <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                   </button>
-                  <button class="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs transition btn-delete-movie" data-id="${m.id}" title="Delete">
+                  <button class="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs transition btn-delete-movie" data-id="${m.id}" title="Delete Movie">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                   </button>
                 </div>
@@ -995,37 +1127,42 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       // Table view
       container.innerHTML = `
-        <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/70">
-          <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-950/80 text-slate-400 font-semibold border-b border-slate-800 uppercase text-[10px] tracking-wider">
+        <div class="overflow-x-auto rounded-xl border border-[rgba(255,255,255,0.06)] bg-[#1c1c21]">
+          <table class="w-full text-left text-xs text-[#85858f]">
+            <thead class="bg-[#242429] text-[#6b6c77] font-semibold border-b border-[rgba(255,255,255,0.04)] uppercase text-[10px] tracking-wider">
               <tr>
-                <th class="py-3 px-4">Movie</th>
+                <th class="py-3 px-4">Movie Poster & Title</th>
                 <th class="py-3 px-4">Genre</th>
                 <th class="py-3 px-4">Duration</th>
-                <th class="py-3 px-4">Rating</th>
+                <th class="py-3 px-4">Release Date</th>
+                <th class="py-3 px-4">Age Rating</th>
                 <th class="py-3 px-4">Base Ticket</th>
                 <th class="py-3 px-4">Status</th>
                 <th class="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-800/80">
+            <tbody class="divide-y divide-[rgba(255,255,255,0.04)]">
               ${movies.map(m => `
-                <tr class="hover:bg-slate-800/40 transition">
-                  <td class="py-3 px-4 font-semibold text-slate-100 flex items-center gap-3">
-                    <img src="${m.poster}" class="w-8 h-11 rounded object-cover" />
-                    <span>${escapeHtml(m.title)}</span>
+                <tr class="hover:bg-[#222227] transition">
+                  <td class="py-3 px-4 font-semibold text-white flex items-center gap-3">
+                    <img src="${m.poster}" class="w-8 h-11 rounded-lg object-cover shadow-sm bg-[#18191d]" alt="${escapeHtml(m.title)}" />
+                    <div>
+                      <span>${escapeHtml(m.title)}</span>
+                      <p class="text-[10px] text-[#6b6c77] font-normal">${m.director || 'Studio Production'}</p>
+                    </div>
                   </td>
-                  <td class="py-3 px-4">${escapeHtml(m.genre)}</td>
+                  <td class="py-3 px-4 text-white">${escapeHtml(m.genre)}</td>
                   <td class="py-3 px-4">${m.duration} min</td>
-                  <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">${m.rating}</span></td>
-                  <td class="py-3 px-4 font-semibold text-amber-400">$${m.basePrice.toFixed(2)}</td>
+                  <td class="py-3 px-4 font-mono text-[11px] text-[#a0a0ab]">${m.releaseDate || 'Current Season'}</td>
+                  <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full bg-[#222227] text-white border border-[rgba(255,255,255,0.08)] text-[10px]">${m.rating}</span></td>
+                  <td class="py-3 px-4 font-mono font-bold text-novaOrange">$${m.basePrice.toFixed(2)}</td>
                   <td class="py-3 px-4">
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${m.status === 'Active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-300'}">${m.status}</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${m.status === 'Active' ? 'bg-[#22c55e]/20 text-[#4ade80]' : m.status === 'Coming Soon' ? 'bg-amber-400/20 text-amber-300' : 'bg-[#222227] text-[#85858f]'}">${m.status}</span>
                   </td>
-                  <td class="py-3 px-4 text-right">
-                    <button class="px-2.5 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-medium mr-1 btn-movie-add-showtime" data-id="${m.id}">Schedule</button>
-                    <button class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-slate-200 btn-edit-movie" data-id="${m.id}"><i data-lucide="edit-3" class="w-3.5 h-3.5 inline"></i></button>
-                    <button class="p-1 rounded hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 ml-1 btn-delete-movie" data-id="${m.id}"><i data-lucide="trash-2" class="w-3.5 h-3.5 inline"></i></button>
+                  <td class="py-3 px-4 text-right whitespace-nowrap">
+                    <button class="px-2.5 py-1 rounded-lg bg-novaOrange/15 hover:bg-novaOrange text-white text-xs font-semibold mr-1.5 btn-movie-add-showtime transition" data-id="${m.id}">Schedule</button>
+                    <button class="p-1.5 rounded-lg bg-[#222227] hover:bg-[#2c2c34] text-[#85858f] hover:text-white btn-edit-movie transition mr-1" data-id="${m.id}" title="Edit Movie"><i data-lucide="edit-3" class="w-3.5 h-3.5 inline"></i></button>
+                    <button class="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 btn-delete-movie transition" data-id="${m.id}" title="Delete Movie"><i data-lucide="trash-2" class="w-3.5 h-3.5 inline"></i></button>
                   </td>
                 </tr>
               `).join("")}
@@ -1052,14 +1189,16 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.addEventListener("click", () => {
         const id = btn.dataset.id;
         const movie = Store.getMovieById(id);
-        if (confirm(`Are you sure you want to remove "${movie?.title}" from theater catalog? Associated showtimes will also be removed.`)) {
+        if (confirm(`Are you sure you want to remove "${movie?.title}" from catalog? Associated showtimes will also be removed.`)) {
           Store.deleteMovie(id);
-          showToast("Movie deleted", "success");
+          showToast("Movie deleted from catalog", "success");
           renderMoviesCatalog();
-          renderShowtimesSchedule();
+          if (AppState.currentView === "showtimes") renderShowtimesSchedule();
         }
       });
     });
+
+    lucide.createIcons();
   }
 
   // Setup Movie Catalog Search and View Toggle controls
@@ -1071,32 +1210,104 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const movieStatusSelect = document.getElementById("movie-status-filter");
+  if (movieStatusSelect) {
+    movieStatusSelect.addEventListener("change", (e) => {
+      movieStatusFilter = e.target.value;
+      renderMoviesCatalog();
+    });
+  }
+
   const btnViewGrid = document.getElementById("btn-movie-view-grid");
   const btnViewTable = document.getElementById("btn-movie-view-table");
   if (btnViewGrid && btnViewTable) {
     btnViewGrid.addEventListener("click", () => {
       movieViewMode = "grid";
-      btnViewGrid.classList.add("bg-slate-700", "text-amber-400");
-      btnViewTable.classList.remove("bg-slate-700", "text-amber-400");
+      btnViewGrid.classList.add("bg-[#2d2d35]", "text-novaOrange");
+      btnViewTable.classList.remove("bg-[#2d2d35]", "text-novaOrange");
       renderMoviesCatalog();
     });
     btnViewTable.addEventListener("click", () => {
       movieViewMode = "table";
-      btnViewTable.classList.add("bg-slate-700", "text-amber-400");
-      btnViewGrid.classList.remove("bg-slate-700", "text-amber-400");
+      btnViewTable.classList.add("bg-[#2d2d35]", "text-novaOrange");
+      btnViewGrid.classList.remove("bg-[#2d2d35]", "text-novaOrange");
       renderMoviesCatalog();
     });
   }
 
-  // Showtime Scheduler
-  let showtimeScreenFilter = "all";
+  // ==========================================================================
+  // MODULE D: SHOWTIME MANAGEMENT (PAGE 3)
+  // ==========================================================================
+  let stTheatreFilter = "all";
+  let stScreenFilter = "all";
+  let stMovieFilter = "all";
+  let stDateFilter = "";
+
   function renderShowtimesSchedule() {
     const container = document.getElementById("showtimes-schedule-container");
     if (!container) return;
 
+    // Populate filter selectors
+    const theatreSelect = document.getElementById("st-filter-theatre");
+    const screenSelect = document.getElementById("st-filter-screen");
+    const movieSelect = document.getElementById("st-filter-movie");
+
+    if (theatreSelect && theatreSelect.children.length <= 1) {
+      const theatres = Store.getTheatres();
+      theatreSelect.innerHTML = `<option value="all">All Theatres</option>` + 
+        theatres.map(th => `<option value="${th.id}">${escapeHtml(th.name)}</option>`).join("");
+      theatreSelect.onchange = (e) => {
+        stTheatreFilter = e.target.value;
+        renderShowtimesSchedule();
+      };
+    }
+
+    if (screenSelect && screenSelect.children.length <= 1) {
+      const screens = Store.getScreens();
+      screenSelect.innerHTML = `<option value="all">All Screens</option>` + 
+        screens.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join("");
+      screenSelect.onchange = (e) => {
+        stScreenFilter = e.target.value;
+        renderShowtimesSchedule();
+      };
+    }
+
+    if (movieSelect && movieSelect.children.length <= 1) {
+      const movies = Store.getMovies();
+      movieSelect.innerHTML = `<option value="all">All Movies</option>` + 
+        movies.map(m => `<option value="${m.id}">${escapeHtml(m.title)}</option>`).join("");
+      movieSelect.onchange = (e) => {
+        stMovieFilter = e.target.value;
+        renderShowtimesSchedule();
+      };
+    }
+
+    const dateInput = document.getElementById("st-filter-date");
+    if (dateInput && !dateInput.dataset.bound) {
+      dateInput.dataset.bound = "true";
+      dateInput.onchange = (e) => {
+        stDateFilter = e.target.value;
+        renderShowtimesSchedule();
+      };
+    }
+
     let showtimes = Store.getShowtimes();
-    if (showtimeScreenFilter !== "all") {
-      showtimes = showtimes.filter(s => s.screenId === showtimeScreenFilter);
+
+    // Apply multi-filters
+    if (stScreenFilter !== "all") {
+      showtimes = showtimes.filter(s => s.screenId === stScreenFilter);
+    }
+    if (stMovieFilter !== "all") {
+      showtimes = showtimes.filter(s => s.movieId === stMovieFilter);
+    }
+    if (stTheatreFilter !== "all") {
+      showtimes = showtimes.filter(s => {
+        const sc = Store.getScreenById(s.screenId);
+        return sc && sc.theatreId === stTheatreFilter;
+      });
+    }
+    if (stDateFilter) {
+      showtimes = showtimes.filter(s => s.date === stDateFilter);
     }
 
     showtimes.sort((a, b) => {
@@ -1104,20 +1315,32 @@ document.addEventListener("DOMContentLoaded", () => {
       return a.startTime.localeCompare(b.startTime);
     });
 
+    if (showtimes.length === 0) {
+      container.innerHTML = `
+        <div class="p-10 text-center text-[#85858f] text-xs bg-[#17181c] rounded-xl border border-[rgba(255,255,255,0.04)]">
+          <i data-lucide="calendar" class="w-8 h-8 text-[#6b6c77] mx-auto mb-2 opacity-50"></i>
+          <p>No showtimes scheduled matching the selected filters.</p>
+        </div>
+      `;
+      lucide.createIcons();
+      return;
+    }
+
     container.innerHTML = `
-      <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/70">
-        <table class="w-full text-left text-xs text-slate-300">
-          <thead class="bg-slate-950/80 text-slate-400 font-semibold border-b border-slate-800 uppercase text-[10px] tracking-wider">
+      <div class="overflow-x-auto rounded-xl border border-[rgba(255,255,255,0.06)] bg-[#1c1c21]">
+        <table class="w-full text-left text-xs text-[#85858f]">
+          <thead class="bg-[#242429] text-[#6b6c77] font-semibold border-b border-[rgba(255,255,255,0.04)] uppercase text-[10px] tracking-wider">
             <tr>
-              <th class="py-3 px-4">Showtime / Screen</th>
-              <th class="py-3 px-4">Allocated Movie</th>
-              <th class="py-3 px-4">Date & Time</th>
+              <th class="py-3 px-4">Movie & Poster</th>
+              <th class="py-3 px-4">Theatre & Screen</th>
+              <th class="py-3 px-4">Date & Slot</th>
               <th class="py-3 px-4">Seat Availability</th>
-              <th class="py-3 px-4">Base Multiplier</th>
+              <th class="py-3 px-4">Pricing Multiplier</th>
+              <th class="py-3 px-4">Calculated Price</th>
               <th class="py-3 px-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-800/80">
+          <tbody class="divide-y divide-[rgba(255,255,255,0.04)]">
             ${showtimes.map(st => {
               const movie = Store.getMovieById(st.movieId);
               const screen = Store.getScreenById(st.screenId);
@@ -1125,38 +1348,43 @@ document.addEventListener("DOMContentLoaded", () => {
               const booked = st.bookedSeats.length;
               const available = total - booked;
               const pct = Math.round((booked / total) * 100);
+              const calcPrice = (movie ? movie.basePrice * st.priceMultiplier : 16.50).toFixed(2);
 
               return `
-                <tr class="hover:bg-slate-800/40 transition">
-                  <td class="py-3 px-4">
-                    <span class="font-semibold text-slate-100">${screen ? screen.name : 'Screen'}</span>
-                    <p class="text-[11px] text-slate-400">${screen ? screen.type : ''}</p>
-                  </td>
-                  <td class="py-3 px-4 font-semibold text-slate-200">
-                    <div class="flex items-center gap-2">
-                      <img src="${movie ? movie.poster : ''}" class="w-7 h-9 rounded object-cover" />
-                      <span>${movie ? escapeHtml(movie.title) : 'Movie'}</span>
+                <tr class="hover:bg-[#222227] transition">
+                  <td class="py-3 px-4 font-semibold text-white">
+                    <div class="flex items-center gap-3">
+                      <img src="${movie ? movie.poster : ''}" class="w-8 h-11 rounded-lg object-cover shadow-sm bg-[#18191d]" alt="${movie ? escapeHtml(movie.title) : 'Movie'}" />
+                      <div>
+                        <span>${movie ? escapeHtml(movie.title) : 'Movie'}</span>
+                        <p class="text-[10px] text-[#6b6c77] font-normal">${movie ? movie.genre : ''}</p>
+                      </div>
                     </div>
                   </td>
                   <td class="py-3 px-4">
-                    <span class="font-medium text-amber-400">${st.date}</span>
-                    <p class="text-[11px] text-slate-400">${st.startTime} — ${st.endTime}</p>
+                    <span class="font-semibold text-white block">${screen ? escapeHtml(screen.name) : 'Screen'}</span>
+                    <span class="text-[11px] text-novaOrange font-medium">${screen ? (screen.theatreName || 'Downtown Complex') : ''}</span>
+                  </td>
+                  <td class="py-3 px-4">
+                    <span class="font-medium text-white block">${st.date}</span>
+                    <span class="text-[11px] font-mono text-novaOrange">${st.startTime} — ${st.endTime}</span>
                   </td>
                   <td class="py-3 px-4">
                     <div class="flex items-center gap-3">
-                      <div class="w-24 h-2 bg-slate-800 rounded-full overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full" style="width: ${pct}%"></div>
+                      <div class="w-24 h-2 bg-[#17181c] rounded-full overflow-hidden p-0.5">
+                        <div class="h-full bg-novaOrange rounded-full" style="width: ${pct}%"></div>
                       </div>
-                      <span class="text-[11px] text-slate-300 font-medium">${booked}/${total} (${pct}%)</span>
+                      <span class="text-[11px] text-white font-mono">${booked}/${total} (${pct}%)</span>
                     </div>
-                    <span class="text-[10px] text-emerald-400">${available} seats available</span>
+                    <span class="text-[10px] text-[#4ade80]">${available} seats open</span>
                   </td>
-                  <td class="py-3 px-4 font-mono text-slate-300">${st.priceMultiplier}x</td>
-                  <td class="py-3 px-4 text-right">
-                    <button class="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold mr-1.5 btn-open-seatmap" data-id="${st.id}">
+                  <td class="py-3 px-4 font-mono text-white">${st.priceMultiplier}x</td>
+                  <td class="py-3 px-4 font-mono font-bold text-novaOrange text-sm">$${calcPrice}</td>
+                  <td class="py-3 px-4 text-right whitespace-nowrap">
+                    <button class="px-3 py-1.5 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white text-xs font-semibold mr-1.5 btn-open-seatmap transition shadow-sm" data-id="${st.id}">
                       Seat Matrix
                     </button>
-                    <button class="p-1.5 rounded-lg hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 btn-delete-showtime" data-id="${st.id}" title="Cancel Screening">
+                    <button class="p-1.5 rounded-xl bg-[#222227] hover:bg-rose-500/20 text-[#85858f] hover:text-rose-400 btn-delete-showtime transition" data-id="${st.id}" title="Cancel Screening">
                       <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     </button>
                   </td>
@@ -1184,17 +1412,286 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
+
+    lucide.createIcons();
   }
 
-  // Showtime screen filter tabs
-  document.querySelectorAll(".tab-screen-filter").forEach(tab => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".tab-screen-filter").forEach(t => t.classList.remove("active", "bg-slate-700", "text-amber-400"));
-      tab.classList.add("active", "bg-slate-700", "text-amber-400");
-      showtimeScreenFilter = tab.dataset.screen;
-      renderShowtimesSchedule();
+  // ==========================================================================
+  // MODULE E: THEATRE & SCREEN MANAGEMENT (PAGE 5)
+  // ==========================================================================
+  let screenFilterTheatre = "all";
+  let screenFilterAvail = "all";
+
+  function renderTheatresAndScreens() {
+    // 1. Render Theatre Locations Cards
+    const theatreListEl = document.getElementById("theatres-list-container");
+    if (theatreListEl) {
+      const theatres = Store.getTheatres();
+      theatreListEl.innerHTML = theatres.map(th => {
+        const screens = Store.getScreens().filter(s => s.theatreId === th.id);
+        const totalCap = screens.reduce((acc, s) => acc + (s.totalSeats || 0), 0);
+        return `
+          <div class="nova-card p-5 flex flex-col justify-between space-y-4">
+            <div class="flex items-start justify-between">
+              <div>
+                <span class="text-[10px] font-bold text-novaOrange uppercase tracking-wider block">Complex Location</span>
+                <h3 class="text-base font-bold text-white mt-0.5">${escapeHtml(th.name)}</h3>
+                <p class="text-xs text-[#85858f] mt-1">${escapeHtml(th.location)} • ${escapeHtml(th.city)}</p>
+              </div>
+              <span class="status-pill-active text-[10px] px-2.5 py-1 rounded-full font-semibold">
+                ● ${th.status}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 p-3 rounded-xl bg-[#17181c] border border-[rgba(255,255,255,0.04)] text-xs">
+              <div>
+                <span class="text-[10px] text-[#6b6c77] uppercase block">Auditoriums</span>
+                <span class="font-bold text-white font-mono">${screens.length} Screens</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-[#6b6c77] uppercase block">Total Capacity</span>
+                <span class="font-bold text-white font-mono">${totalCap} Seats</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-[#6b6c77] uppercase block">Manager</span>
+                <span class="font-semibold text-novaOrange truncate block">${escapeHtml(th.manager || 'Marcus Vance')}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-[#85858f] pt-1">
+              <span>Contact: <strong class="text-white">${escapeHtml(th.phone || '+1 555-019-2834')}</strong></span>
+              <button onclick="document.getElementById('screen-filter-theatre').value='${th.id}'; document.getElementById('screen-filter-theatre').dispatchEvent(new Event('change'));" class="text-novaOrange hover:underline font-semibold text-xs">
+                Filter Screens &rarr;
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // 2. Populate Screen Filters
+    const filterTh = document.getElementById("screen-filter-theatre");
+    const filterAv = document.getElementById("screen-filter-avail");
+    if (filterTh && filterTh.children.length <= 1) {
+      filterTh.innerHTML = `<option value="all">All Theatres</option>` + 
+        Store.getTheatres().map(th => `<option value="${th.id}">${escapeHtml(th.name)}</option>`).join("");
+      filterTh.onchange = (e) => {
+        screenFilterTheatre = e.target.value;
+        renderTheatresAndScreens();
+      };
+    }
+    if (filterAv && !filterAv.dataset.bound) {
+      filterAv.dataset.bound = "true";
+      filterAv.onchange = (e) => {
+        screenFilterAvail = e.target.value;
+        renderTheatresAndScreens();
+      };
+    }
+
+    // 3. Render Screens Grid / Cards
+    const screenGrid = document.getElementById("theatres-screens-container");
+    if (!screenGrid) return;
+
+    let screens = Store.getScreens();
+    if (screenFilterTheatre !== "all") {
+      screens = screens.filter(s => s.theatreId === screenFilterTheatre);
+    }
+    if (screenFilterAvail !== "all") {
+      screens = screens.filter(s => (s.availability || "Available") === screenFilterAvail);
+    }
+
+    if (screens.length === 0) {
+      screenGrid.innerHTML = `
+        <div class="col-span-full p-10 text-center text-[#85858f] text-xs bg-[#17181c] rounded-xl border border-[rgba(255,255,255,0.04)]">
+          <p>No screens found matching the selected filter criteria.</p>
+        </div>
+      `;
+      lucide.createIcons();
+      return;
+    }
+
+    screenGrid.innerHTML = screens.map(s => {
+      const avail = s.availability || "Available";
+      let statusClass = "status-pill-available";
+      if (avail === "Maintenance") statusClass = "status-pill-maintenance";
+      if (avail === "Cleaning") statusClass = "status-pill-cleaning";
+
+      const vipCount = (s.tiers && s.tiers.vipRows ? s.tiers.vipRows.length * (s.cols || 10) : 16);
+      const accCount = (s.tiers && s.tiers.accessibleRows ? s.tiers.accessibleRows.length * (s.cols || 10) : 8);
+      const stdCount = (s.totalSeats || 60) - vipCount - accCount;
+
+      return `
+        <div class="nova-card p-5 flex flex-col justify-between space-y-4 hover:border-[rgba(255,255,255,0.12)] transition">
+          <div>
+            <div class="flex items-start justify-between">
+              <div>
+                <span class="text-[10px] text-novaOrange font-bold uppercase tracking-wider block">${escapeHtml(s.theatreName || 'Downtown Complex')}</span>
+                <h4 class="font-bold text-white text-base mt-0.5">${escapeHtml(s.name)}</h4>
+              </div>
+              <span class="${statusClass} text-[10px] px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full ${avail === 'Available' ? 'bg-[#2dd4bf]' : avail === 'Maintenance' ? 'bg-amber-400' : 'bg-indigo-400'}"></span>
+                ${avail}
+              </span>
+            </div>
+            <p class="text-xs text-[#a0a0ab] mt-1 flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-novaOrange"></i>
+              <span>${escapeHtml(s.type || 'Digital 4K')}</span>
+            </p>
+          </div>
+
+          <!-- Seating Capacity Breakdown -->
+          <div class="p-3 rounded-xl bg-[#17181c] border border-[rgba(255,255,255,0.04)] space-y-2 text-xs">
+            <div class="flex justify-between items-center text-[#85858f]">
+              <span>Total Seating Capacity:</span>
+              <strong class="font-mono text-white font-bold text-sm">${s.totalSeats || 60} Seats</strong>
+            </div>
+            <div class="grid grid-cols-3 gap-1 pt-1.5 border-t border-[rgba(255,255,255,0.04)] text-[10px] text-center font-mono">
+              <div class="p-1 rounded bg-[#232238] text-[#818cf8]">VIP: ${vipCount}</div>
+              <div class="p-1 rounded bg-[#222227] text-white">Std: ${Math.max(0, stdCount)}</div>
+              <div class="p-1 rounded bg-[#172a2e] text-[#2dd4bf]">Acc: ${accCount}</div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-between pt-2 border-t border-[rgba(255,255,255,0.05)] text-xs">
+            <div class="flex items-center gap-1">
+              <select class="h-7 px-2 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-[11px] text-white select-screen-status" data-id="${s.id}">
+                <option value="Available" ${avail === 'Available' ? 'selected' : ''}>Available</option>
+                <option value="Maintenance" ${avail === 'Maintenance' ? 'selected' : ''}>Maintenance</option>
+                <option value="Cleaning" ${avail === 'Cleaning' ? 'selected' : ''}>Cleaning</option>
+              </select>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button class="p-1.5 rounded-lg bg-[#222227] hover:bg-[#2c2c34] text-[#85858f] hover:text-white transition btn-edit-screen" data-id="${s.id}" title="Edit Screen">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+              </button>
+              <button class="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition btn-delete-screen" data-id="${s.id}" title="Delete Screen">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    // Bind Quick Status Toggle
+    screenGrid.querySelectorAll(".select-screen-status").forEach(sel => {
+      sel.addEventListener("change", (e) => {
+        const id = sel.dataset.id;
+        const newStatus = e.target.value;
+        Store.updateScreen(id, { availability: newStatus });
+        showToast(`Auditorium status updated to ${newStatus}`, "success");
+        renderTheatresAndScreens();
+      });
     });
-  });
+
+    // Bind Edit Screen
+    screenGrid.querySelectorAll(".btn-edit-screen").forEach(btn => {
+      btn.addEventListener("click", () => {
+        openEditScreenModal(btn.dataset.id);
+      });
+    });
+
+    // Bind Delete Screen
+    screenGrid.querySelectorAll(".btn-delete-screen").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.id;
+        const sc = Store.getScreenById(id);
+        if (confirm(`Are you sure you want to delete auditorium "${sc?.name}"?`)) {
+          Store.deleteScreen(id);
+          showToast("Screen deleted", "success");
+          renderTheatresAndScreens();
+        }
+      });
+    });
+
+    // Bind Add Screen button
+    const btnAddScreen = document.getElementById("btn-open-screen-modal");
+    if (btnAddScreen) {
+      btnAddScreen.onclick = () => openAddScreenModal();
+    }
+
+    lucide.createIcons();
+  }
+
+  // SCREEN MODAL HELPERS
+  function openAddScreenModal() {
+    const modal = document.getElementById("modal-screen-form");
+    const form = document.getElementById("form-screen");
+    const title = document.getElementById("modal-screen-title");
+    if (!modal || !form) return;
+
+    form.reset();
+    document.getElementById("screen-input-id").value = "";
+    if (title) title.textContent = "Add New Screen & Auditorium";
+
+    // Populate theatre dropdown
+    const thSelect = document.getElementById("screen-input-theatre");
+    thSelect.innerHTML = Store.getTheatres().map(th => `
+      <option value="${th.id}">${escapeHtml(th.name)} (${escapeHtml(th.city)})</option>
+    `).join("");
+
+    modal.classList.remove("hidden");
+  }
+
+  function openEditScreenModal(screenId) {
+    const screen = Store.getScreenById(screenId);
+    if (!screen) return;
+
+    const modal = document.getElementById("modal-screen-form");
+    const form = document.getElementById("form-screen");
+    const title = document.getElementById("modal-screen-title");
+    if (!modal || !form) return;
+
+    document.getElementById("screen-input-id").value = screen.id;
+    if (title) title.textContent = `Edit Auditorium: ${screen.name}`;
+
+    // Populate theatre dropdown
+    const thSelect = document.getElementById("screen-input-theatre");
+    thSelect.innerHTML = Store.getTheatres().map(th => `
+      <option value="${th.id}" ${th.id === screen.theatreId ? 'selected' : ''}>${escapeHtml(th.name)}</option>
+    `).join("");
+
+    document.getElementById("screen-input-name").value = screen.name;
+    document.getElementById("screen-input-type").value = screen.type || "IMAX Laser";
+    document.getElementById("screen-input-seats").value = screen.totalSeats || 60;
+    document.getElementById("screen-input-availability").value = screen.availability || "Available";
+
+    modal.classList.remove("hidden");
+  }
+
+  const formScreen = document.getElementById("form-screen");
+  if (formScreen) {
+    formScreen.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const id = document.getElementById("screen-input-id").value;
+      const thId = document.getElementById("screen-input-theatre").value;
+      const th = Store.getTheatreById(thId);
+
+      const screenData = {
+        name: document.getElementById("screen-input-name").value.trim(),
+        theatreId: thId,
+        theatreName: th ? th.name : "Downtown Complex",
+        type: document.getElementById("screen-input-type").value,
+        totalSeats: parseInt(document.getElementById("screen-input-seats").value) || 60,
+        availability: document.getElementById("screen-input-availability").value
+      };
+
+      try {
+        if (id) {
+          Store.updateScreen(id, screenData);
+          showToast("Auditorium specification updated", "success");
+        } else {
+          Store.addScreen(screenData);
+          showToast("New screen added successfully", "success");
+        }
+        document.getElementById("modal-screen-form").classList.add("hidden");
+        renderTheatresAndScreens();
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    });
+  }
 
   // ==========================================================================
   // MODULE D: BOX OFFICE & REAL-TIME SEAT MATRIX (THE CORE EXPERIENCE)
@@ -1627,9 +2124,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==========================================================================
-  // MODULE E: CUSTOMER CRM & LOYALTY MANAGEMENT
+  // MODULE F: CUSTOMER MANAGEMENT (PAGE 6)
   // ==========================================================================
   let customerTierFilter = "all";
+  let customerStatusFilter = "all";
   let customerSearchQuery = "";
 
   function renderCustomerCRM() {
@@ -1642,6 +2140,10 @@ document.addEventListener("DOMContentLoaded", () => {
       customers = customers.filter(c => c.tier.toLowerCase() === customerTierFilter.toLowerCase());
     }
 
+    if (customerStatusFilter !== "all") {
+      customers = customers.filter(c => (c.accountStatus || "Active") === customerStatusFilter);
+    }
+
     if (customerSearchQuery) {
       const q = customerSearchQuery.toLowerCase();
       customers = customers.filter(c => 
@@ -1651,57 +2153,99 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const getTierBadge = (tier) => {
       switch (tier.toLowerCase()) {
-        case "platinum": return "bg-purple-500/20 text-purple-300 border-purple-500/40";
-        case "gold": return "bg-amber-500/20 text-amber-300 border-amber-500/40";
-        case "silver": return "bg-slate-400/20 text-slate-300 border-slate-400/40";
-        default: return "bg-orange-600/20 text-orange-300 border-orange-600/40";
+        case "platinum": return "pill-purple";
+        case "gold": return "pill-yellow";
+        case "silver": return "pill-dark";
+        default: return "pill-orange";
       }
     };
 
-    tableBody.innerHTML = customers.map(c => `
-      <tr class="hover:bg-slate-800/40 cursor-pointer transition customer-row" data-id="${c.id}">
-        <td class="py-3.5 px-4">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-xs text-amber-400">
-              ${c.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+    const getStatusBadge = (status) => {
+      switch (status) {
+        case "VIP Member": return "status-pill-vip";
+        case "Suspended": return "status-pill-suspended";
+        default: return "status-pill-active";
+      }
+    };
+
+    if (customers.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="9" class="py-12 text-center text-[#85858f] text-xs">
+            No customers match the active filters or search terms.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tableBody.innerHTML = customers.map(c => {
+      const status = c.accountStatus || "Active";
+      return `
+        <tr class="hover:bg-[#222227] transition">
+          <td class="py-3.5 px-4 whitespace-nowrap">
+            <div class="flex items-center gap-3">
+              <img src="${c.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=60&auto=format&fit=crop&q=80'}" class="w-8 h-8 rounded-full object-cover border border-[rgba(255,255,255,0.08)]" alt="${escapeHtml(c.name)}" />
+              <div>
+                <p class="font-semibold text-white text-xs">${escapeHtml(c.name)}</p>
+                <span class="text-[10px] text-[#6b6c77]">Joined ${c.joinDate || '2024'}</span>
+              </div>
             </div>
-            <div>
-              <p class="font-semibold text-slate-100">${escapeHtml(c.name)}</p>
-              <p class="text-[11px] text-slate-400">${escapeHtml(c.email)}</p>
+          </td>
+          <td class="py-3.5 px-4 whitespace-nowrap">
+            <p class="font-mono text-xs text-[#a0a0ab]">${escapeHtml(c.email)}</p>
+            <p class="text-[11px] text-[#6b6c77]">${escapeHtml(c.phone)}</p>
+          </td>
+          <td class="py-3.5 px-4 whitespace-nowrap">
+            <span class="pill-badge ${getTierBadge(c.tier)}">
+              ${c.tier}
+            </span>
+          </td>
+          <td class="py-3.5 px-4 whitespace-nowrap">
+            <span class="${getStatusBadge(status)} text-[10px] px-2.5 py-1 rounded-full font-semibold">
+              ● ${status}
+            </span>
+          </td>
+          <td class="py-3.5 px-4 font-semibold text-white whitespace-nowrap">${c.visitCount} visits</td>
+          <td class="py-3.5 px-4 font-mono font-bold text-novaOrange whitespace-nowrap">$${c.totalSpent.toFixed(2)}</td>
+          <td class="py-3.5 px-4 font-mono text-white whitespace-nowrap">${c.points.toLocaleString()} pts</td>
+          <td class="py-3.5 px-4 text-[#85858f] text-xs whitespace-nowrap">${c.lastVisit || 'N/A'}</td>
+          <td class="py-3.5 px-4 text-right whitespace-nowrap">
+            <div class="flex items-center justify-end gap-1.5">
+              <select class="h-7 px-2 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-[11px] text-[#85858f] select-cust-status" data-id="${c.id}" title="Change Account Status">
+                <option value="Active" ${status === 'Active' ? 'selected' : ''}>Active</option>
+                <option value="VIP Member" ${status === 'VIP Member' ? 'selected' : ''}>VIP Member</option>
+                <option value="Suspended" ${status === 'Suspended' ? 'selected' : ''}>Suspended</option>
+              </select>
+              <button class="px-2.5 py-1.5 rounded-lg bg-[#222227] hover:bg-[#2c2c34] text-white text-xs font-medium transition btn-inspect-customer" data-id="${c.id}">
+                Profile
+              </button>
             </div>
-          </div>
-        </td>
-        <td class="py-3.5 px-4 font-mono text-xs text-slate-300">${escapeHtml(c.phone)}</td>
-        <td class="py-3.5 px-4">
-          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${getTierBadge(c.tier)}">
-            ${c.tier}
-          </span>
-        </td>
-        <td class="py-3.5 px-4 font-semibold text-slate-200">${c.visitCount} visits</td>
-        <td class="py-3.5 px-4 font-mono font-semibold text-amber-400">$${c.totalSpent.toFixed(2)}</td>
-        <td class="py-3.5 px-4 font-mono text-slate-300">${c.points.toLocaleString()} pts</td>
-        <td class="py-3.5 px-4 text-slate-400 text-xs">${c.lastVisit || 'N/A'}</td>
-        <td class="py-3.5 px-4 text-right">
-          <button class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium transition btn-inspect-customer" data-id="${c.id}">
-            Inspect Profile
-          </button>
-        </td>
-      </tr>
-    `).join("");
+          </td>
+        </tr>
+      `;
+    }).join("");
 
     // Attach row inspection handlers
-    tableBody.querySelectorAll(".customer-row").forEach(row => {
-      row.addEventListener("click", () => {
-        openCustomerProfileDrawer(row.dataset.id);
-      });
-    });
-
     tableBody.querySelectorAll(".btn-inspect-customer").forEach(btn => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         openCustomerProfileDrawer(btn.dataset.id);
       });
     });
+
+    // Attach status toggle handlers
+    tableBody.querySelectorAll(".select-cust-status").forEach(sel => {
+      sel.addEventListener("change", (e) => {
+        const id = sel.dataset.id;
+        const newStatus = e.target.value;
+        Store.updateCustomerStatus(id, newStatus);
+        showToast(`Account status updated to ${newStatus}`, "success");
+        renderCustomerCRM();
+      });
+    });
+
+    lucide.createIcons();
   }
 
   // CRM Search & Filters
@@ -1713,10 +2257,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const crmStatusSelect = document.getElementById("customer-status-filter");
+  if (crmStatusSelect) {
+    crmStatusSelect.addEventListener("change", (e) => {
+      customerStatusFilter = e.target.value;
+      renderCustomerCRM();
+    });
+  }
+
   document.querySelectorAll(".tab-tier-filter").forEach(tab => {
     tab.addEventListener("click", () => {
-      document.querySelectorAll(".tab-tier-filter").forEach(t => t.classList.remove("active", "bg-slate-700", "text-amber-400"));
-      tab.classList.add("active", "bg-slate-700", "text-amber-400");
+      document.querySelectorAll(".tab-tier-filter").forEach(t => t.classList.remove("active", "bg-[#26262d]", "text-white"));
+      tab.classList.add("active", "bg-[#26262d]", "text-white");
       customerTierFilter = tab.dataset.tier;
       renderCustomerCRM();
     });
@@ -1736,61 +2288,59 @@ document.addEventListener("DOMContentLoaded", () => {
     const reservations = Store.getReservations().filter(r => r.customerId === customerId);
 
     container.innerHTML = `
-      <div class="p-6 border-b border-slate-800 bg-slate-900/80">
+      <div class="p-6 border-b border-[rgba(255,255,255,0.06)] bg-[#18191e]">
         <div class="flex items-start justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 text-slate-950 font-black text-lg flex items-center justify-center shadow-lg">
-              ${customer.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
-            </div>
+            <img src="${customer.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80'}" class="w-12 h-12 rounded-2xl object-cover border-2 border-novaOrange shadow-lg" alt="${escapeHtml(customer.name)}" />
             <div>
               <div class="flex items-center gap-2">
                 <h3 class="font-bold text-white text-lg">${escapeHtml(customer.name)}</h3>
-                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">${customer.tier}</span>
+                <span class="pill-badge pill-orange text-[10px]">${customer.tier}</span>
               </div>
-              <p class="text-xs text-slate-400">${escapeHtml(customer.email)} • ${escapeHtml(customer.phone)}</p>
+              <p class="text-xs text-[#85858f] mt-0.5">${escapeHtml(customer.email)} • ${escapeHtml(customer.phone)}</p>
             </div>
           </div>
-          <button id="btn-close-cust-drawer" class="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition">
+          <button id="btn-close-cust-drawer" class="p-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] hover:text-white transition">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
 
         <!-- Customer Stats KPI Grid -->
         <div class="grid grid-cols-4 gap-2 mt-5">
-          <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-center">
-            <span class="text-[10px] uppercase text-slate-500 font-semibold">Total Spent</span>
-            <p class="font-bold font-mono text-amber-400 text-sm mt-0.5">$${customer.totalSpent.toFixed(2)}</p>
+          <div class="p-2.5 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.04)] text-center">
+            <span class="text-[10px] uppercase text-[#6b6c77] font-semibold">Total Spent</span>
+            <p class="font-bold font-mono text-novaOrange text-sm mt-0.5">$${customer.totalSpent.toFixed(2)}</p>
           </div>
-          <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-center">
-            <span class="text-[10px] uppercase text-slate-500 font-semibold">Visits</span>
-            <p class="font-bold text-slate-200 text-sm mt-0.5">${customer.visitCount}</p>
+          <div class="p-2.5 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.04)] text-center">
+            <span class="text-[10px] uppercase text-[#6b6c77] font-semibold">Visits</span>
+            <p class="font-bold text-white text-sm mt-0.5">${customer.visitCount}</p>
           </div>
-          <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-center">
-            <span class="text-[10px] uppercase text-slate-500 font-semibold">Points</span>
-            <p class="font-bold font-mono text-cyan-400 text-sm mt-0.5">${customer.points}</p>
+          <div class="p-2.5 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.04)] text-center">
+            <span class="text-[10px] uppercase text-[#6b6c77] font-semibold">Points</span>
+            <p class="font-bold font-mono text-[#2dd4bf] text-sm mt-0.5">${customer.points}</p>
           </div>
-          <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-center">
-            <span class="text-[10px] uppercase text-slate-500 font-semibold">Member Since</span>
-            <p class="font-medium text-slate-400 text-xs mt-1">${customer.joinDate || '2024'}</p>
+          <div class="p-2.5 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.04)] text-center">
+            <span class="text-[10px] uppercase text-[#6b6c77] font-semibold">Status</span>
+            <p class="font-semibold text-xs mt-1 text-[#4ade80]">${customer.accountStatus || 'Active'}</p>
           </div>
         </div>
       </div>
 
       <!-- Staff Notes & Preferences -->
-      <div class="p-6 space-y-4 border-b border-slate-800">
+      <div class="p-6 space-y-4 border-b border-[rgba(255,255,255,0.06)]">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Box Office Staff Notes</label>
-          <textarea id="drawer-cust-notes" rows="2" class="w-full text-xs p-2.5 rounded-lg bg-slate-950 border border-slate-800 focus:border-amber-500 focus:outline-none text-slate-200">${escapeHtml(customer.notes || '')}</textarea>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1.5">Box Office Staff Notes</label>
+          <textarea id="drawer-cust-notes" rows="2" class="w-full text-xs p-2.5 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] focus:border-novaOrange focus:outline-none text-white">${escapeHtml(customer.notes || '')}</textarea>
           <div class="flex justify-end mt-1.5">
-            <button id="btn-save-cust-notes" class="px-3 py-1 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-semibold transition">Save Notes</button>
+            <button id="btn-save-cust-notes" class="px-3 py-1.5 rounded-lg bg-novaOrange hover:bg-novaOrange-hover text-white text-xs font-semibold transition">Save Notes</button>
           </div>
         </div>
 
         <div>
-          <span class="block text-xs font-semibold text-slate-300 mb-1.5">Preferred Genres</span>
+          <span class="block text-xs font-semibold text-[#85858f] mb-1.5">Preferred Genres</span>
           <div class="flex flex-wrap gap-1.5">
             ${(customer.preferredGenres || ['Sci-Fi', 'Drama']).map(g => `
-              <span class="px-2 py-0.5 rounded-full text-[10px] bg-slate-800 text-slate-300 border border-slate-700">${escapeHtml(g)}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] bg-[#222227] text-white border border-[rgba(255,255,255,0.06)]">${escapeHtml(g)}</span>
             `).join("")}
           </div>
         </div>
@@ -1798,33 +2348,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
       <!-- Reservation History Ledger for this customer -->
       <div class="p-6">
-        <h4 class="font-bold text-sm text-slate-200 mb-3 flex items-center justify-between">
+        <h4 class="font-bold text-sm text-white mb-3 flex items-center justify-between">
           <span>Booking History (${reservations.length})</span>
-          <span class="text-xs text-slate-500 font-normal">Click to reprint pass</span>
+          <span class="text-xs text-[#85858f] font-normal">Click to reprint pass</span>
         </h4>
         <div class="space-y-2.5 max-h-72 overflow-y-auto">
           ${reservations.length > 0 ? reservations.map(r => {
             const st = Store.getShowtimeById(r.showtimeId);
             const mov = st ? Store.getMovieById(st.movieId) : null;
             return `
-              <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition flex items-center justify-between">
+              <div class="p-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.04)] hover:border-[rgba(255,255,255,0.1)] transition flex items-center justify-between">
                 <div>
                   <div class="flex items-center gap-2">
-                    <span class="font-bold text-xs text-amber-400">${r.id}</span>
-                    <span class="text-xs font-medium text-slate-200">${mov ? escapeHtml(mov.title) : 'Movie'}</span>
+                    <span class="font-bold text-xs text-novaOrange font-mono">${r.id}</span>
+                    <span class="text-xs font-medium text-white">${mov ? escapeHtml(mov.title) : 'Movie'}</span>
                   </div>
-                  <p class="text-[11px] text-slate-400 mt-0.5">Seats: <span class="font-semibold text-slate-300">${r.seats.join(", ")}</span> • $${r.totalAmount.toFixed(2)}</p>
-                  <span class="text-[10px] text-slate-500">${r.createdAt}</span>
+                  <p class="text-[11px] text-[#85858f] mt-0.5">Seats: <span class="font-semibold text-white">${r.seats.join(", ")}</span> • $${r.totalAmount.toFixed(2)}</p>
+                  <span class="text-[10px] text-[#6b6c77]">${r.createdAt}</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${r.status === 'Confirmed' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">${r.status}</span>
-                  <button class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 btn-view-hist-ticket" data-id="${r.id}" title="View Ticket">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${r.status === 'Confirmed' ? 'bg-[#22c55e]/20 text-[#4ade80]' : 'bg-rose-500/20 text-rose-400'}">${r.status}</span>
+                  <button class="p-1.5 rounded-lg bg-[#1c1c21] hover:bg-[#2e2e38] text-[#85858f] hover:text-white btn-view-hist-ticket transition" data-id="${r.id}" title="View Ticket">
                     <i data-lucide="ticket" class="w-3.5 h-3.5"></i>
                   </button>
                 </div>
               </div>
             `;
-          }).join("") : `<div class="text-xs text-slate-500 text-center py-4">No reservations on file.</div>`}
+          }).join("") : `<div class="text-xs text-[#85858f] text-center py-4">No reservations on file.</div>`}
         </div>
       </div>
     `;
@@ -1853,7 +2403,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==========================================================================
-  // MODULE F: RESERVATIONS & REFUND DESK
+  // MODULE G: BOOKING MANAGEMENT (PAGE 4)
   // ==========================================================================
   let reservationStatusFilter = "all";
   let reservationSearchQuery = "";
@@ -1885,6 +2435,17 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
+    if (reservations.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="9" class="py-12 text-center text-[#85858f] text-xs">
+            No bookings found matching the current search or status filter.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
     tableBody.innerHTML = reservations.map(r => {
       const customer = Store.getCustomerById(r.customerId);
       const showtime = Store.getShowtimeById(r.showtimeId);
@@ -1893,37 +2454,46 @@ document.addEventListener("DOMContentLoaded", () => {
       const isRefunded = r.status.includes("Refunded");
 
       return `
-        <tr class="hover:bg-slate-800/40 transition">
-          <td class="py-3 px-4 font-mono font-bold text-amber-400">${r.id}</td>
-          <td class="py-3 px-4 font-semibold text-slate-100">
-            ${customer ? escapeHtml(customer.name) : 'Guest'}
-            <p class="text-[10px] text-slate-500">${customer ? customer.email : ''}</p>
+        <tr class="hover:bg-[#222227] transition">
+          <td class="py-3 px-4 font-mono font-bold text-novaOrange">${r.id}</td>
+          <td class="py-3 px-4 font-semibold text-white">
+            <div class="flex items-center gap-2">
+              <span>${customer ? escapeHtml(customer.name) : 'Guest Patron'}</span>
+              <span class="pill-badge pill-orange text-[9px]">${customer ? customer.tier : 'Bronze'}</span>
+            </div>
+            <p class="text-[10px] text-[#6b6c77] font-normal">${customer ? customer.email : ''}</p>
           </td>
-          <td class="py-3 px-4 font-semibold text-slate-200">${movie ? escapeHtml(movie.title) : 'Movie'}</td>
+          <td class="py-3 px-4 font-semibold text-white">
+            <div class="flex items-center gap-2">
+              <img src="${movie ? movie.poster : ''}" class="w-6 h-8 rounded object-cover bg-[#18191d]" alt="" />
+              <span>${movie ? escapeHtml(movie.title) : 'Movie'}</span>
+            </div>
+          </td>
           <td class="py-3 px-4 text-xs">
-            <span class="text-slate-300">${screen ? screen.name : 'Screen'}</span>
-            <p class="text-[10px] text-slate-500">${showtime ? showtime.date + ' @ ' + showtime.startTime : ''}</p>
+            <span class="text-white block font-medium">${screen ? screen.name : 'Screen'}</span>
+            <p class="text-[10px] text-[#6b6c77]">${showtime ? showtime.date + ' @ ' + showtime.startTime : ''}</p>
           </td>
-          <td class="py-3 px-4 font-mono font-semibold text-slate-200">
-            ${r.seats.map(s => `<span class="px-1.5 py-0.5 rounded bg-slate-800 text-amber-300 text-[10px] mr-1">${s}</span>`).join("")}
+          <td class="py-3 px-4 font-mono font-semibold text-white">
+            ${r.seats.map(s => `<span class="px-1.5 py-0.5 rounded bg-novaOrange/15 text-novaOrange text-[10px] mr-1">${s}</span>`).join("")}
           </td>
-          <td class="py-3 px-4 font-mono font-bold text-slate-100">$${r.totalAmount.toFixed(2)}</td>
-          <td class="py-3 px-4 text-xs text-slate-400">${r.paymentMethod}</td>
+          <td class="py-3 px-4 font-mono font-bold text-white">$${r.totalAmount.toFixed(2)}</td>
+          <td class="py-3 px-4 text-xs text-[#a0a0ab]">${r.paymentMethod}</td>
           <td class="py-3 px-4">
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${isRefunded ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${isRefunded ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-[#22c55e]/20 text-[#4ade80] border border-[#22c55e]/30'}">
               ${r.status}
             </span>
           </td>
-          <td class="py-3 px-4 text-right">
-            <button class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium mr-1.5 btn-ledger-ticket" data-id="${r.id}">
+          <td class="py-3 px-4 text-right whitespace-nowrap">
+            <button class="px-2.5 py-1 rounded-lg bg-[#222227] hover:bg-[#2c2c34] text-white text-xs font-medium mr-1.5 btn-ledger-ticket transition" data-id="${r.id}" title="View Digital Pass">
               Pass
             </button>
             <button 
-              class="px-2.5 py-1 rounded ${isRefunded ? 'bg-slate-800/40 text-slate-600 cursor-not-allowed' : 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30'} text-xs font-medium btn-ledger-refund" 
+              class="px-2.5 py-1 rounded-lg ${isRefunded ? 'bg-[#222227] text-[#6b6c77] cursor-not-allowed' : 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30'} text-xs font-medium btn-ledger-refund transition" 
               data-id="${r.id}"
               ${isRefunded ? 'disabled' : ''}
+              title="${isRefunded ? 'Already Refunded' : 'Cancel Booking & Release Seats'}"
             >
-              ${isRefunded ? 'Refunded' : 'Refund'}
+              ${isRefunded ? 'Refunded' : 'Cancel'}
             </button>
           </td>
         </tr>
@@ -1955,8 +2525,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".tab-res-filter").forEach(tab => {
     tab.addEventListener("click", () => {
-      document.querySelectorAll(".tab-res-filter").forEach(t => t.classList.remove("active", "bg-slate-700", "text-amber-400"));
-      tab.classList.add("active", "bg-slate-700", "text-amber-400");
+      document.querySelectorAll(".tab-res-filter").forEach(t => t.classList.remove("active", "bg-[#26262d]", "text-white"));
+      tab.classList.add("active", "bg-[#26262d]", "text-white");
       reservationStatusFilter = tab.dataset.status;
       renderReservationsLedger();
     });
@@ -1978,26 +2548,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const screen = showtime ? Store.getScreenById(showtime.screenId) : null;
 
     detailsContainer.innerHTML = `
-      <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs">
+      <div class="p-4 rounded-xl bg-[#17181c] border border-[rgba(255,255,255,0.06)] space-y-2.5 text-xs">
         <div class="flex justify-between">
-          <span class="text-slate-400">Booking Reference:</span>
-          <span class="font-mono font-bold text-amber-400">${reservation.id}</span>
+          <span class="text-[#85858f]">Booking Reference:</span>
+          <span class="font-mono font-bold text-novaOrange">${reservation.id}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-slate-400">Movie & Screen:</span>
-          <span class="font-semibold text-slate-200">${movie ? movie.title : ''} (${screen ? screen.name : ''})</span>
+          <span class="text-[#85858f]">Movie & Screen:</span>
+          <span class="font-semibold text-white">${movie ? movie.title : ''} (${screen ? screen.name : ''})</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-slate-400">Seats to Release:</span>
+          <span class="text-[#85858f]">Seats to Release:</span>
           <span class="font-mono font-bold text-rose-400">${reservation.seats.join(", ")}</span>
         </div>
-        <div class="flex justify-between border-t border-slate-800 pt-2">
-          <span class="text-slate-400">Refund Amount:</span>
-          <span class="font-mono font-bold text-emerald-400 text-sm">$${reservation.totalAmount.toFixed(2)}</span>
+        <div class="flex justify-between border-t border-[rgba(255,255,255,0.06)] pt-2">
+          <span class="text-[#85858f]">Refund Amount:</span>
+          <span class="font-mono font-bold text-[#4ade80] text-sm">$${reservation.totalAmount.toFixed(2)}</span>
         </div>
       </div>
-      <p class="text-[11px] text-amber-400/80 leading-relaxed mt-3">
-        ⚠️ Warning: Confirming this action will immediately release seats <strong>[${reservation.seats.join(", ")}]</strong> back to Available for other patrons and adjust analytics.
+      <p class="text-[11px] text-amber-300/80 leading-relaxed mt-3">
+        ⚠️ Warning: Confirming this action will immediately release seats <strong>[${reservation.seats.join(", ")}]</strong> back into open inventory and adjust daily revenue telemetry.
       </p>
     `;
 
@@ -2026,11 +2596,58 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==========================================================================
-  // MODULE G: SETTINGS & SYSTEM DATA MANAGEMENT
+  // MODULE H: PROFILE & SETTINGS (PAGE 7)
   // ==========================================================================
   function renderSettingsView() {
     const settings = Store.getSettings();
+    const admin = settings.adminProfile || {
+      name: "Marcus Vance",
+      email: "marcus.vance@cinepulse.io",
+      phone: "+1 (555) 019-2834",
+      role: "Lead Operations & Sales Manager",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80",
+      department: "Box Office Telemetry & Sales",
+      theatreComplex: "CinePulse Downtown Complex Alpha"
+    };
 
+    // 1. Populate Admin Profile Panel
+    const adminName = document.getElementById("setting-admin-name");
+    const adminEmail = document.getElementById("setting-admin-email");
+    const adminPhone = document.getElementById("setting-admin-phone");
+    const adminRole = document.getElementById("setting-admin-role");
+    const adminComplex = document.getElementById("setting-admin-complex");
+    const adminDept = document.getElementById("setting-admin-dept");
+    const adminAvatar = document.getElementById("setting-admin-avatar");
+    const avatarPreview = document.getElementById("admin-profile-avatar-preview");
+    const nameHeading = document.getElementById("admin-profile-name-heading");
+    const roleHeading = document.getElementById("admin-profile-role-heading");
+
+    if (adminName) adminName.value = admin.name || "";
+    if (adminEmail) adminEmail.value = admin.email || "";
+    if (adminPhone) adminPhone.value = admin.phone || "";
+    if (adminRole) adminRole.value = admin.role || "";
+    if (adminComplex) adminComplex.value = admin.theatreComplex || "";
+    if (adminDept) adminDept.value = admin.department || "";
+    if (adminAvatar) adminAvatar.value = admin.avatar || "";
+    if (avatarPreview && admin.avatar) avatarPreview.src = admin.avatar;
+    if (nameHeading) nameHeading.textContent = admin.name || "Marcus Vance";
+    if (roleHeading) roleHeading.textContent = admin.role || "Lead Operations Manager";
+
+    // 2. Populate Notification Toggles
+    const notifs = settings.notifications || {};
+    const tHigh = document.getElementById("notif-toggle-highvalue");
+    const tLow = document.getElementById("notif-toggle-lowcapacity");
+    const tRef = document.getElementById("notif-toggle-refunds");
+    const tDig = document.getElementById("notif-toggle-digest");
+    const tChim = document.getElementById("notif-toggle-chimes");
+
+    if (tHigh) tHigh.checked = notifs.highValueAlerts !== false;
+    if (tLow) tLow.checked = notifs.lowCapacityAlerts !== false;
+    if (tRef) tRef.checked = notifs.refundAlerts !== false;
+    if (tDig) tDig.checked = notifs.dailyDigest === true;
+    if (tChim) tChim.checked = notifs.soundChimes !== false;
+
+    // 3. Populate Cinema Operational Parameters
     const nameInput = document.getElementById("setting-cinema-name");
     const locInput = document.getElementById("setting-cinema-location");
     const currInput = document.getElementById("setting-currency");
@@ -2055,61 +2672,86 @@ document.addEventListener("DOMContentLoaded", () => {
       const totalRecs = Store.getMovies().length + Store.getShowtimes().length + Store.getCustomers().length + Store.getReservations().length;
       diagRecords.textContent = `${totalRecs} active records`;
     }
+
+    setupSettingsSubTabs();
   }
 
-  // Save Settings
-  const btnSaveSettings = document.getElementById("btn-save-settings");
-  if (btnSaveSettings) {
-    btnSaveSettings.addEventListener("click", () => {
-      const updated = {
-        cinemaName: document.getElementById("setting-cinema-name").value.trim(),
-        location: document.getElementById("setting-cinema-location").value.trim(),
-        currency: document.getElementById("setting-currency").value.trim(),
-        taxRate: parseFloat(document.getElementById("setting-tax-rate").value) || 0,
-        bookingFee: parseFloat(document.getElementById("setting-booking-fee").value) || 0,
-        activeStaff: document.getElementById("setting-active-staff").value.trim()
+  function setupSettingsSubTabs() {
+    document.querySelectorAll(".tab-settings-nav").forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll(".tab-settings-nav").forEach(t => {
+          t.classList.remove("bg-[#24242a]", "text-white");
+          t.classList.add("text-[#85858f]");
+        });
+        tab.classList.add("bg-[#24242a]", "text-white");
+        tab.classList.remove("text-[#85858f]");
+
+        const panelKey = tab.dataset.panel;
+        document.querySelectorAll(".settings-subpanel").forEach(p => p.classList.add("hidden"));
+        const activeP = document.getElementById(`settings-panel-${panelKey}`);
+        if (activeP) activeP.classList.remove("hidden");
+        lucide.createIcons();
       };
-      Store.updateSettings(updated);
-      showToast("Cinema configuration updated successfully", "success");
-      updateHeaderPills();
     });
   }
 
-  // Export JSON
-  const btnExport = document.getElementById("btn-export-backup");
-  if (btnExport) {
-    btnExport.addEventListener("click", () => {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(Store.exportDatabaseJSON());
-      const downloadAnchor = document.createElement("a");
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `cinepulse_backup_${new Date().toISOString().split("T")[0]}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-      showToast("Database exported successfully", "success");
+  // Save Admin Profile Handler
+  const formAdminProfile = document.getElementById("form-admin-profile");
+  if (formAdminProfile) {
+    formAdminProfile.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const updatedProfile = {
+        name: document.getElementById("setting-admin-name").value.trim(),
+        email: document.getElementById("setting-admin-email").value.trim(),
+        phone: document.getElementById("setting-admin-phone").value.trim(),
+        role: document.getElementById("setting-admin-role").value.trim(),
+        theatreComplex: document.getElementById("setting-admin-complex").value.trim(),
+        department: document.getElementById("setting-admin-dept").value.trim(),
+        avatar: document.getElementById("setting-admin-avatar").value.trim()
+      };
+      Store.updateAdminProfile(updatedProfile);
+      showToast("Administrator profile updated successfully", "success");
+      renderSettingsView();
     });
   }
 
-  // Import JSON
-  const btnImport = document.getElementById("btn-import-backup");
-  const fileInput = document.getElementById("import-file-input");
-  if (btnImport && fileInput) {
-    btnImport.addEventListener("click", () => fileInput.click());
-    fileInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+  // Save Password Handler
+  const formAdminPassword = document.getElementById("form-admin-password");
+  if (formAdminPassword) {
+    formAdminPassword.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const oldPass = document.getElementById("setting-old-password").value;
+      const newPass = document.getElementById("setting-new-password").value;
+      const confPass = document.getElementById("setting-confirm-password").value;
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const res = Store.importDatabaseJSON(event.target.result);
-        if (res.success) {
-          showToast("Database restored successfully!", "success");
-          switchView("overview");
-        } else {
-          showToast(`Import Failed: ${res.error}`, "error");
-        }
+      if (newPass !== confPass) {
+        showToast("New passwords do not match. Please verify.", "error");
+        return;
+      }
+
+      try {
+        Store.changeAdminPassword(oldPass, newPass);
+        showToast("Admin account password successfully rotated", "success");
+        formAdminPassword.reset();
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    });
+  }
+
+  // Save Notification Preferences
+  const btnSaveNotifications = document.getElementById("btn-save-notifications");
+  if (btnSaveNotifications) {
+    btnSaveNotifications.addEventListener("click", () => {
+      const prefs = {
+        highValueAlerts: document.getElementById("notif-toggle-highvalue").checked,
+        lowCapacityAlerts: document.getElementById("notif-toggle-lowcapacity").checked,
+        refundAlerts: document.getElementById("notif-toggle-refunds").checked,
+        dailyDigest: document.getElementById("notif-toggle-digest").checked,
+        soundChimes: document.getElementById("notif-toggle-chimes").checked
       };
-      reader.readAsText(file);
+      Store.updateNotificationPreferences(prefs);
+      showToast("Operational notification preferences saved", "success");
     });
   }
 
@@ -2147,6 +2789,8 @@ document.addEventListener("DOMContentLoaded", () => {
     titleEl.textContent = "Add New Movie to Catalog";
     form.reset();
     form.dataset.mode = "create";
+    document.getElementById("movie-input-id").value = "";
+    document.getElementById("movie-input-releasedate").value = new Date().toISOString().split("T")[0];
     modal.classList.remove("hidden");
   }
 
@@ -2162,6 +2806,7 @@ document.addEventListener("DOMContentLoaded", () => {
     form.dataset.mode = "edit";
     form.dataset.id = movieId;
 
+    document.getElementById("movie-input-id").value = movieId;
     document.getElementById("movie-input-title").value = movie.title;
     document.getElementById("movie-input-genre").value = movie.genre;
     document.getElementById("movie-input-duration").value = movie.duration;
@@ -2169,6 +2814,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("movie-input-price").value = movie.basePrice;
     document.getElementById("movie-input-poster").value = movie.poster;
     document.getElementById("movie-input-director").value = movie.director || "";
+    document.getElementById("movie-input-releasedate").value = movie.releaseDate || new Date().toISOString().split("T")[0];
     document.getElementById("movie-input-status").value = movie.status;
     document.getElementById("movie-input-synopsis").value = movie.synopsis || "";
 
@@ -2180,15 +2826,16 @@ document.addEventListener("DOMContentLoaded", () => {
     formMovie.addEventListener("submit", (e) => {
       e.preventDefault();
       const movieData = {
-        title: document.getElementById("movie-input-title").value,
-        genre: document.getElementById("movie-input-genre").value,
-        duration: document.getElementById("movie-input-duration").value,
+        title: document.getElementById("movie-input-title").value.trim(),
+        genre: document.getElementById("movie-input-genre").value.trim(),
+        duration: parseInt(document.getElementById("movie-input-duration").value, 10) || 120,
         rating: document.getElementById("movie-input-rating").value,
-        basePrice: document.getElementById("movie-input-price").value,
-        poster: document.getElementById("movie-input-poster").value,
-        director: document.getElementById("movie-input-director").value,
+        basePrice: parseFloat(document.getElementById("movie-input-price").value) || 16.50,
+        poster: document.getElementById("movie-input-poster").value.trim() || "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&auto=format&fit=crop&q=80",
+        director: document.getElementById("movie-input-director").value.trim() || "Studio Director",
+        releaseDate: document.getElementById("movie-input-releasedate").value || new Date().toISOString().split("T")[0],
         status: document.getElementById("movie-input-status").value,
-        synopsis: document.getElementById("movie-input-synopsis").value
+        synopsis: document.getElementById("movie-input-synopsis").value.trim()
       };
 
       if (formMovie.dataset.mode === "edit") {

@@ -14,13 +14,54 @@ const INITIAL_DEMO_DATA = {
     taxRate: 8.5,
     bookingFee: 1.50,
     shiftName: "Evening Peak Shift",
-    activeStaff: "Marcus Vance (Box Office Lead)"
+    activeStaff: "Marcus Vance (Box Office Lead)",
+    adminProfile: {
+      name: "Marcus Vance",
+      email: "marcus.vance@cinepulse.io",
+      phone: "+1 (555) 019-2834",
+      role: "Lead Operations & Sales Manager",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80",
+      department: "Box Office Telemetry & Sales",
+      theatreComplex: "CinePulse Downtown Complex Alpha"
+    },
+    notifications: {
+      highValueAlerts: true,
+      lowCapacityAlerts: true,
+      refundAlerts: true,
+      dailyDigest: false,
+      soundChimes: true
+    }
   },
+  theatres: [
+    {
+      id: "th-1",
+      name: "CinePulse Downtown Complex",
+      location: "742 Evergreen Blvd, Downtown District",
+      city: "Metro City",
+      totalScreens: 2,
+      status: "Active",
+      phone: "+1 (555) 234-5678",
+      manager: "Marcus Vance"
+    },
+    {
+      id: "th-2",
+      name: "CinePulse Uptown Luxe Promenade",
+      location: "88 Ocean Drive, West Promenade",
+      city: "Uptown",
+      totalScreens: 1,
+      status: "Active",
+      phone: "+1 (555) 876-5432",
+      manager: "Elena Rostova"
+    }
+  ],
   screens: [
     {
       id: "scr-1",
+      theatreId: "th-1",
+      theatreName: "CinePulse Downtown Complex",
       name: "Screen 1 - IMAX Laser 4K",
       type: "IMAX Laser",
+      availability: "Available",
       totalSeats: 80,
       rows: 8, // A to H
       cols: 10, // 1 to 10
@@ -33,8 +74,11 @@ const INITIAL_DEMO_DATA = {
     },
     {
       id: "scr-2",
+      theatreId: "th-1",
+      theatreName: "CinePulse Downtown Complex",
       name: "Screen 2 - Dolby Atmos Prime",
       type: "Dolby Atmos",
+      availability: "Available",
       totalSeats: 60,
       rows: 6, // A to F
       cols: 10,
@@ -47,8 +91,11 @@ const INITIAL_DEMO_DATA = {
     },
     {
       id: "scr-3",
+      theatreId: "th-2",
+      theatreName: "CinePulse Uptown Luxe Promenade",
       name: "Screen 3 - Luxe Recliner Studio",
       type: "VIP Lounge",
+      availability: "Maintenance",
       totalSeats: 40,
       rows: 4, // A to D
       cols: 10,
@@ -944,6 +991,34 @@ class CinePulseStore {
         const parsed = JSON.parse(stored);
         // Verify key structural integrity
         if (parsed.movies && parsed.screens && parsed.showtimes && parsed.customers && parsed.reservations) {
+          // Migration: Theatres
+          if (!parsed.theatres || parsed.theatres.length === 0) {
+            parsed.theatres = INITIAL_DEMO_DATA.theatres;
+          }
+          // Migration: Admin Profile & Notifications
+          if (!parsed.settings.adminProfile) {
+            parsed.settings.adminProfile = INITIAL_DEMO_DATA.settings.adminProfile;
+          }
+          if (!parsed.settings.notifications) {
+            parsed.settings.notifications = INITIAL_DEMO_DATA.settings.notifications;
+          }
+          // Ensure movies have releaseDate
+          parsed.movies.forEach((m, idx) => {
+            if (!m.releaseDate) {
+              const defaultDates = ["2023-07-21", "2024-03-01", "2023-06-02", "2024-11-07", "2023-06-23", "2023-10-06", "2024-11-22"];
+              m.releaseDate = defaultDates[idx % defaultDates.length] || "2024-05-15";
+            }
+          });
+          // Ensure screens have theatreId & availability
+          parsed.screens.forEach(s => {
+            if (!s.theatreId) s.theatreId = s.id === "scr-3" ? "th-2" : "th-1";
+            if (!s.theatreName) s.theatreName = s.theatreId === "th-2" ? "CinePulse Uptown Luxe Promenade" : "CinePulse Downtown Complex";
+            if (!s.availability) s.availability = s.id === "scr-3" ? "Maintenance" : "Available";
+          });
+          // Ensure customers have accountStatus
+          parsed.customers.forEach(c => {
+            if (!c.accountStatus) c.accountStatus = (c.tier === "Platinum" || c.tier === "Gold") ? "VIP Member" : "Active";
+          });
           return parsed;
         }
       }
@@ -1434,6 +1509,170 @@ class CinePulseStore {
     return Object.values(movieStats)
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
+  }
+
+  // --- THEATRES ---
+  getTheatres() {
+    return this.data.theatres || [];
+  }
+
+  getTheatreById(id) {
+    return (this.data.theatres || []).find(th => th.id === id);
+  }
+
+  addTheatre(th) {
+    const newTheatre = {
+      id: "th-" + Date.now(),
+      name: th.name.trim(),
+      location: th.location.trim(),
+      city: th.city?.trim() || "Metro City",
+      totalScreens: parseInt(th.totalScreens) || 1,
+      status: th.status || "Active",
+      phone: th.phone?.trim() || "+1 (555) 000-0000",
+      manager: th.manager?.trim() || "Marcus Vance"
+    };
+    if (!this.data.theatres) this.data.theatres = [];
+    this.data.theatres.push(newTheatre);
+    this.save();
+    return newTheatre;
+  }
+
+  // --- SCREENS ENHANCED ---
+  addScreen(data) {
+    const newScreen = {
+      id: "scr-" + Date.now(),
+      theatreId: data.theatreId || "th-1",
+      theatreName: data.theatreId === "th-2" ? "CinePulse Uptown Luxe Promenade" : "CinePulse Downtown Complex",
+      name: data.name.trim(),
+      type: data.type || "IMAX Laser",
+      availability: data.availability || "Available",
+      totalSeats: parseInt(data.totalSeats) || 60,
+      rows: 6,
+      cols: 10,
+      pricing: {
+        vip: parseFloat(data.pricingVip) || 22.00,
+        standard: parseFloat(data.pricingStandard) || 16.50,
+        accessible: parseFloat(data.pricingAccessible) || 15.00
+      },
+      tiers: {
+        vipRows: ["A", "B"],
+        standardRows: ["C", "D", "E"],
+        accessibleRows: ["F"]
+      }
+    };
+    this.data.screens.push(newScreen);
+    this.addActivity("system", "Screen Provisioned", `"${newScreen.name}" added to theater matrix.`);
+    this.save();
+    return newScreen;
+  }
+
+  updateScreen(id, updateData) {
+    const idx = this.data.screens.findIndex(s => s.id === id);
+    if (idx !== -1) {
+      this.data.screens[idx] = { ...this.data.screens[idx], ...updateData };
+      this.save();
+      return this.data.screens[idx];
+    }
+    return null;
+  }
+
+  deleteScreen(id) {
+    const screen = this.getScreenById(id);
+    if (!screen) return false;
+    this.data.screens = this.data.screens.filter(s => s.id !== id);
+    this.save();
+    return true;
+  }
+
+  // --- CUSTOMER ENHANCEMENTS ---
+  updateCustomer(id, updateData) {
+    const idx = this.data.customers.findIndex(c => c.id === id);
+    if (idx !== -1) {
+      this.data.customers[idx] = { ...this.data.customers[idx], ...updateData };
+      this.save();
+      return this.data.customers[idx];
+    }
+    return null;
+  }
+
+  updateCustomerStatus(id, newStatus) {
+    const cust = this.getCustomerById(id);
+    if (cust) {
+      cust.accountStatus = newStatus;
+      this.save();
+      return cust;
+    }
+    return null;
+  }
+
+  // --- DASHBOARD TELEMETRY WIDGETS ---
+  getRecentBookings(limit = 6) {
+    return (this.data.reservations || [])
+      .slice(0, limit)
+      .map(r => {
+        const cust = this.getCustomerById(r.customerId);
+        const st = this.getShowtimeById(r.showtimeId);
+        const movie = st ? this.getMovieById(st.movieId) : null;
+        const screen = st ? this.getScreenById(st.screenId) : null;
+        return {
+          ...r,
+          customerName: cust ? cust.name : "Guest Patron",
+          customerEmail: cust ? cust.email : "guest@cinepulse.io",
+          customerAvatar: cust ? (cust.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=60&auto=format&fit=crop&q=80") : "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=60&auto=format&fit=crop&q=80",
+          customerTier: cust ? cust.tier : "Bronze",
+          movieTitle: movie ? movie.title : (r.movieTitle || "Movie"),
+          moviePoster: movie ? movie.poster : "",
+          screenName: screen ? screen.name : (r.screenName || "Screen"),
+          theatreName: screen ? (screen.theatreName || "Downtown Complex") : "Downtown Complex",
+          paymentStatus: r.status === "Cancelled / Refunded" ? "Refunded" : "Paid"
+        };
+      });
+  }
+
+  getPopularMovies(limit = 4) {
+    const movies = this.getMovies();
+    const stats = this.getTopMoviesAnalytics();
+    return movies.slice(0, limit).map((m, idx) => {
+      const stat = stats.find(s => s.title === m.title);
+      const simulatedRevs = [54200, 48300, 39600, 31400];
+      const simulatedOcc = [88, 76, 68, 62];
+      return {
+        ...m,
+        revenue: stat && stat.revenue > 0 ? stat.revenue : simulatedRevs[idx % simulatedRevs.length],
+        ticketsSold: stat && stat.ticketsSold > 0 ? stat.ticketsSold : Math.floor(simulatedRevs[idx % simulatedRevs.length] / 17),
+        occupancy: simulatedOcc[idx % simulatedOcc.length]
+      };
+    });
+  }
+
+  // --- PROFILE & SETTINGS ---
+  updateAdminProfile(profileData) {
+    if (!this.data.settings.adminProfile) {
+      this.data.settings.adminProfile = {};
+    }
+    this.data.settings.adminProfile = { ...this.data.settings.adminProfile, ...profileData };
+    this.addActivity("system", "Profile Updated", "Administrator account details updated.");
+    this.save();
+    return this.data.settings.adminProfile;
+  }
+
+  updateNotificationPreferences(notifData) {
+    this.data.settings.notifications = { ...this.data.settings.notifications, ...notifData };
+    this.addActivity("system", "Notification Alerts Updated", "Operational notification preferences saved.");
+    this.save();
+    return this.data.settings.notifications;
+  }
+
+  changeAdminPassword(oldPass, newPass) {
+    if (!oldPass || oldPass.trim().length === 0) {
+      throw new Error("Current password verification failed. Please enter your valid current password.");
+    }
+    if (!newPass || newPass.length < 6) {
+      throw new Error("New password must be at least 6 characters.");
+    }
+    this.addActivity("system", "Security Credential Changed", "Admin account password successfully rotated.");
+    this.save();
+    return { success: true };
   }
 }
 

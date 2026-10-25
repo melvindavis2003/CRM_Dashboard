@@ -78,36 +78,48 @@
         </button>
       </div>
 
-      <!-- Primary Navigation Links -->
+      <!-- Primary Navigation Links (7 Core Pages) -->
       <nav class="space-y-1">
+        <!-- 1. Dashboard -->
         <a href="#overview" data-view="overview" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition bg-[#24242a] text-white">
           <i data-lucide="layout-grid" class="w-4 h-4 flex-shrink-0"></i>
           <span class="sidebar-text">Dashboard</span>
         </a>
 
-        <a href="#crm" data-view="crm" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
-          <i data-lucide="phone" class="w-4 h-4 flex-shrink-0"></i>
-          <span class="sidebar-text">Contacts</span>
-        </a>
-
-        <a href="#reservations" data-view="reservations" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
-          <i data-lucide="file-text" class="w-4 h-4 flex-shrink-0"></i>
-          <span class="sidebar-text">Reports</span>
-        </a>
-
+        <!-- 2. Movie Management -->
         <a href="#movies" data-view="movies" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
           <i data-lucide="film" class="w-4 h-4 flex-shrink-0"></i>
-          <span class="sidebar-text">Movies & Shows</span>
+          <span class="sidebar-text">Movie Management</span>
         </a>
 
-        <a href="#boxoffice" data-view="boxoffice" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
-          <i data-lucide="armchair" class="w-4 h-4 flex-shrink-0"></i>
-          <span class="sidebar-text">Box Office & Seats</span>
+        <!-- 3. Showtime Management -->
+        <a href="#showtimes" data-view="showtimes" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
+          <i data-lucide="calendar-clock" class="w-4 h-4 flex-shrink-0"></i>
+          <span class="sidebar-text">Showtime Management</span>
         </a>
 
+        <!-- 4. Booking Management -->
+        <a href="#bookings" data-view="bookings" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
+          <i data-lucide="ticket" class="w-4 h-4 flex-shrink-0"></i>
+          <span class="sidebar-text">Booking Management</span>
+        </a>
+
+        <!-- 5. Theatre & Screen Management -->
+        <a href="#theatres" data-view="theatres" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
+          <i data-lucide="monitor" class="w-4 h-4 flex-shrink-0"></i>
+          <span class="sidebar-text">Theatre & Screen</span>
+        </a>
+
+        <!-- 6. Customer Management -->
+        <a href="#customers" data-view="customers" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
+          <i data-lucide="users" class="w-4 h-4 flex-shrink-0"></i>
+          <span class="sidebar-text">Customer Management</span>
+        </a>
+
+        <!-- 7. Profile & Settings -->
         <a href="#settings" data-view="settings" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
           <i data-lucide="settings" class="w-4 h-4 flex-shrink-0"></i>
-          <span class="sidebar-text">Settings</span>
+          <span class="sidebar-text">Profile & Settings</span>
         </a>
       </nav>
 
@@ -479,6 +491,47 @@
         </div>
 
         <!-- ================================================================ -->
+        <!-- DASHBOARD TELEMETRY: RECENT BOOKINGS & POPULAR MOVIES            -->
+        <!-- ================================================================ -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          
+          <!-- Widget 1: Recent Bookings Stream -->
+          <div class="nova-card p-6 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-4 border-b border-[rgba(255,255,255,0.05)] pb-3">
+              <div class="flex items-center gap-2">
+                <i data-lucide="ticket" class="w-4 h-4 text-novaOrange"></i>
+                <h3 class="font-bold text-white text-sm">Recent Bookings</h3>
+              </div>
+              <button onclick="switchView('bookings')" class="text-xs text-[#85858f] hover:text-white transition flex items-center gap-1 font-medium">
+                <span>View All</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <div id="overview-recent-bookings-list" class="space-y-2.5">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Widget 2: Popular Movies & Box Office Occupancy -->
+          <div class="nova-card p-6 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-4 border-b border-[rgba(255,255,255,0.05)] pb-3">
+              <div class="flex items-center gap-2">
+                <i data-lucide="flame" class="w-4 h-4 text-amber-400"></i>
+                <h3 class="font-bold text-white text-sm">Popular Movies</h3>
+              </div>
+              <button onclick="switchView('movies')" class="text-xs text-[#85858f] hover:text-white transition flex items-center gap-1 font-medium">
+                <span>Manage Catalog</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <div id="overview-popular-movies-list" class="space-y-3">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================================================================ -->
         <!-- BOTTOM DATA TABLE: 357 CONTACT / CRM BOOKINGS (PHOTO 1)          -->
         <!-- ================================================================ -->
         <div class="nova-card p-6 space-y-4">
@@ -567,41 +620,43 @@
       </section>
 
       <!-- ================================================================== -->
-      <!-- VIEW 2: MOVIE & SHOWTIME SCHEDULER                                 -->
+      <!-- VIEW 2: MOVIE MANAGEMENT                                           -->
       <!-- ================================================================== -->
       <section id="view-movies" class="view-container hidden space-y-6 max-w-7xl mx-auto">
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="text-xl font-bold text-white">Movie Catalog & Auditorium Scheduling</h2>
-            <p class="text-xs text-[#85858f]">Manage film assets, operational statuses, and conflict-free showtime allocations</p>
+            <h2 class="text-xl font-bold text-white">Movie Management</h2>
+            <p class="text-xs text-[#85858f]">Movie posters, titles, genres, duration, release dates, and add/edit/delete actions</p>
           </div>
           <div class="flex items-center gap-2">
             <button onclick="document.getElementById('quick-add-movie-btn').click()" class="px-4 py-2 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-semibold text-xs transition flex items-center gap-1.5 shadow-lg shadow-novaOrange/20">
               <i data-lucide="plus" class="w-4 h-4"></i>
               <span>Add Movie</span>
             </button>
-            <button onclick="document.getElementById('quick-add-showtime-btn').click()" class="px-4 py-2 rounded-xl bg-[#222227] hover:bg-[#2c2c34] text-white border border-[rgba(255,255,255,0.08)] font-semibold text-xs transition flex items-center gap-1.5">
-              <i data-lucide="calendar-plus" class="w-4 h-4 text-novaOrange"></i>
-              <span>Schedule Showtime</span>
-            </button>
           </div>
         </div>
 
-        <!-- Section 1: Movies in Rotation -->
+        <!-- Movie Catalog Controls & Container -->
         <div class="nova-card p-6 space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[rgba(255,255,255,0.05)] pb-3">
             <div class="flex items-center gap-2">
               <i data-lucide="film" class="w-4 h-4 text-novaOrange"></i>
-              <h3 class="font-semibold text-white text-sm">Active Film Rotation</h3>
+              <h3 class="font-semibold text-white text-sm">Feature Film Rotation</h3>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
               <input 
                 type="text" 
                 id="movie-search-filter" 
-                placeholder="Search movies by title or genre..." 
-                class="h-8 px-3 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange w-56"
+                placeholder="Search movies by title, genre, director..." 
+                class="h-8 px-3 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange w-52 sm:w-60"
               />
+              <select id="movie-status-filter" class="h-8 px-3 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-[#85858f] focus:outline-none focus:border-novaOrange">
+                <option value="all">All Statuses</option>
+                <option value="Active">Active Rotation</option>
+                <option value="Coming Soon">Coming Soon</option>
+                <option value="Archived">Archived</option>
+              </select>
               <div class="flex items-center bg-[#222227] p-0.5 rounded-lg border border-[rgba(255,255,255,0.06)]">
                 <button id="btn-movie-view-grid" class="p-1.5 rounded-md bg-[#2d2d35] text-novaOrange transition" title="Grid View">
                   <i data-lucide="grid" class="w-3.5 h-3.5"></i>
@@ -616,23 +671,78 @@
           <div id="movies-catalog-container"></div>
         </div>
 
-        <!-- Section 2: Showtime Allocations -->
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- VIEW 3: SHOWTIME MANAGEMENT                                        -->
+      <!-- ================================================================== -->
+      <section id="view-showtimes" class="view-container hidden space-y-6 max-w-7xl mx-auto">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Showtime Management</h2>
+            <p class="text-xs text-[#85858f]">Select movies, theatres, screens, dates, times, and ticket prices</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="document.getElementById('quick-add-showtime-btn').click()" class="px-4 py-2 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-semibold text-xs transition flex items-center gap-1.5 shadow-lg shadow-novaOrange/20">
+              <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+              <span>Schedule Showtime</span>
+            </button>
+            <button onclick="switchView('boxoffice')" class="px-4 py-2 rounded-xl bg-[#222227] hover:bg-[#2c2c34] text-white border border-[rgba(255,255,255,0.08)] font-semibold text-xs transition flex items-center gap-1.5">
+              <i data-lucide="layout-grid" class="w-4 h-4 text-novaOrange"></i>
+              <span>Live Seat Matrix</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Showtime Filters & Conflict Engine Notice -->
         <div class="nova-card p-6 space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[rgba(255,255,255,0.05)] pb-3">
-            <div class="flex items-center gap-2">
-              <i data-lucide="calendar" class="w-4 h-4 text-[#2dd4bf]"></i>
-              <h3 class="font-semibold text-white text-sm">Scheduled Showtimes & Availability</h3>
+          
+          <!-- Collision Prevention Notice -->
+          <div class="p-3 rounded-xl bg-[#17181c] border border-[rgba(255,255,255,0.05)] flex items-center justify-between text-xs text-[#85858f]">
+            <div class="flex items-center gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-[#2dd4bf] animate-pulse"></span>
+              <span class="text-white font-medium">Conflict-Free Collision Engine:</span>
+              <span>Automatically enforces duration + 20min auditorium cleaning buffers.</span>
             </div>
-            <!-- Screen Filter Tabs -->
-            <div class="flex items-center gap-1.5 text-xs">
-              <button class="tab-screen-filter px-3 py-1.5 rounded-lg bg-[#26262d] text-white font-medium active" data-screen="all">All Screens</button>
-              <button class="tab-screen-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-medium" data-screen="scr-1">Screen 1 (IMAX)</button>
-              <button class="tab-screen-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-medium" data-screen="scr-2">Screen 2 (Dolby)</button>
-              <button class="tab-screen-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-medium" data-screen="scr-3">Screen 3 (Luxe)</button>
+            <span class="font-mono text-[10px] text-novaOrange hidden sm:inline">Active Multi-Screen Engine</span>
+          </div>
+
+          <!-- Multi-Param Filter Controls -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+            <!-- Filter: Theatre -->
+            <div>
+              <label class="block text-[11px] font-semibold text-[#85858f] mb-1">Filter by Theatre</label>
+              <select id="st-filter-theatre" class="w-full h-8 px-3 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange">
+                <option value="all">All Theatre Locations</option>
+              </select>
+            </div>
+
+            <!-- Filter: Screen -->
+            <div>
+              <label class="block text-[11px] font-semibold text-[#85858f] mb-1">Filter by Screen</label>
+              <select id="st-filter-screen" class="w-full h-8 px-3 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange">
+                <option value="all">All Auditoriums / Screens</option>
+              </select>
+            </div>
+
+            <!-- Filter: Movie -->
+            <div>
+              <label class="block text-[11px] font-semibold text-[#85858f] mb-1">Filter by Movie</label>
+              <select id="st-filter-movie" class="w-full h-8 px-3 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange">
+                <option value="all">All Movies in Rotation</option>
+              </select>
+            </div>
+
+            <!-- Filter: Date -->
+            <div>
+              <label class="block text-[11px] font-semibold text-[#85858f] mb-1">Filter by Date</label>
+              <input type="date" id="st-filter-date" class="w-full h-8 px-3 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
             </div>
           </div>
-          <!-- Showtimes Schedule Container -->
-          <div id="showtimes-schedule-container"></div>
+
+          <!-- Showtimes List Container -->
+          <div id="showtimes-schedule-container" class="pt-2"></div>
         </div>
 
       </section>
@@ -778,14 +888,126 @@
       </section>
 
       <!-- ================================================================== -->
-      <!-- VIEW 4: CUSTOMER CRM & LOYALTY MANAGEMENT                          -->
+      <!-- VIEW 4: BOOKING MANAGEMENT                                         -->
       <!-- ================================================================== -->
-      <section id="view-crm" class="view-container hidden space-y-6 max-w-7xl mx-auto">
+      <section id="view-bookings" class="view-container hidden space-y-6 max-w-7xl mx-auto">
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="text-xl font-bold text-white">Customer CRM & Loyalty Directory</h2>
-            <p class="text-xs text-[#85858f]">Patron profiles, tiered loyalty points, visit histories, and box office staff notes</p>
+            <h2 class="text-xl font-bold text-white">Booking Management</h2>
+            <p class="text-xs text-[#85858f]">Booking ID, customer name, movie, seats, amount, payment status, and cancellation</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="switchView('boxoffice')" class="px-4 py-2 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-semibold text-xs transition flex items-center gap-1.5 shadow-lg shadow-novaOrange/20">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>New Walk-in Booking</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="nova-card p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="relative w-full md:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-[#6b6c77] absolute left-3 top-2.5"></i>
+            <input 
+              type="text" 
+              id="reservation-search-filter" 
+              placeholder="Search by Booking ID, customer, movie, seat..." 
+              class="w-full h-9 pl-9 pr-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange"
+            />
+          </div>
+
+          <!-- Status Filter Tabs -->
+          <div class="flex items-center gap-1.5 text-xs">
+            <button class="tab-res-filter px-3 py-1.5 rounded-lg bg-[#26262d] text-white font-semibold active" data-status="all">All Bookings</button>
+            <button class="tab-res-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-status="confirmed">Confirmed</button>
+            <button class="tab-res-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-status="refunded">Cancelled / Refunded</button>
+          </div>
+        </div>
+
+        <!-- Bookings Ledger Table -->
+        <div class="nova-card overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-[#85858f]">
+              <thead class="bg-[#242429] text-[#6b6c77] font-medium border-b border-[rgba(255,255,255,0.04)] uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th class="py-3 px-4">Booking ID</th>
+                  <th class="py-3 px-4">Customer Name</th>
+                  <th class="py-3 px-4">Movie</th>
+                  <th class="py-3 px-4">Auditorium & Slot</th>
+                  <th class="py-3 px-4">Seats</th>
+                  <th class="py-3 px-4">Amount</th>
+                  <th class="py-3 px-4">Payment</th>
+                  <th class="py-3 px-4">Booking Status</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="reservations-ledger-tbody" class="divide-y divide-[rgba(255,255,255,0.04)]"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- VIEW 5: THEATRE & SCREEN MANAGEMENT                                -->
+      <!-- ================================================================== -->
+      <section id="view-theatres" class="view-container hidden space-y-6 max-w-7xl mx-auto">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Theatre & Screen Management</h2>
+            <p class="text-xs text-[#85858f]">Theatre locations, screen names, seating capacity, and screen availability</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-open-screen-modal" class="px-4 py-2 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-semibold text-xs transition flex items-center gap-1.5 shadow-lg shadow-novaOrange/20">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Add Screen</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 1: Complex & Location Cards -->
+        <div>
+          <h3 class="text-xs font-bold text-[#85858f] uppercase tracking-wider mb-3">Theatre Locations Overview</h3>
+          <div id="theatres-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- Section 2: Auditoriums & Screens List -->
+        <div class="nova-card p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[rgba(255,255,255,0.05)] pb-3">
+            <div class="flex items-center gap-2">
+              <i data-lucide="monitor" class="w-4 h-4 text-novaOrange"></i>
+              <h3 class="font-semibold text-white text-sm">Auditoriums & Seating Capacity Specifications</h3>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <select id="screen-filter-theatre" class="h-8 px-3 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange">
+                <option value="all">All Theatres</option>
+              </select>
+              <select id="screen-filter-avail" class="h-8 px-3 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange">
+                <option value="all">All Availabilities</option>
+                <option value="Available">Available</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Cleaning">Cleaning</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="theatres-screens-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-1"></div>
+        </div>
+
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- VIEW 6: CUSTOMER MANAGEMENT                                        -->
+      <!-- ================================================================== -->
+      <section id="view-customers" class="view-container hidden space-y-6 max-w-7xl mx-auto">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Customer Management</h2>
+            <p class="text-xs text-[#85858f]">Customer list, contact details, booking history, and account status</p>
           </div>
           <button onclick="document.getElementById('quick-add-customer-btn').click()" class="px-4 py-2 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-semibold text-xs transition flex items-center gap-1.5 self-start sm:self-auto shadow-lg shadow-novaOrange/20">
             <i data-lucide="user-plus" class="w-4 h-4"></i>
@@ -800,30 +1022,41 @@
             <input 
               type="text" 
               id="crm-search-filter" 
-              placeholder="Search by patron name, email, or phone..." 
+              placeholder="Search by name, email, or phone..." 
               class="w-full h-9 pl-9 pr-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange"
             />
           </div>
 
-          <!-- Tier Filter Tabs -->
-          <div class="flex items-center gap-1.5 text-xs overflow-x-auto pb-1 md:pb-0">
-            <button class="tab-tier-filter px-3 py-1.5 rounded-lg bg-[#26262d] text-white font-semibold active" data-tier="all">All Tiers</button>
-            <button class="tab-tier-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-tier="platinum">Platinum</button>
-            <button class="tab-tier-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-tier="gold">Gold</button>
-            <button class="tab-tier-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-tier="silver">Silver</button>
-            <button class="tab-tier-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-tier="bronze">Bronze</button>
+          <div class="flex flex-wrap items-center gap-3">
+            <!-- Account Status Filter -->
+            <select id="customer-status-filter" class="h-8 px-3 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-[#85858f] focus:outline-none focus:border-novaOrange">
+              <option value="all">All Account Statuses</option>
+              <option value="Active">Active</option>
+              <option value="VIP Member">VIP Member</option>
+              <option value="Suspended">Suspended</option>
+            </select>
+
+            <!-- Tier Filter Tabs -->
+            <div class="flex items-center gap-1 text-xs">
+              <button class="tab-tier-filter px-3 py-1.5 rounded-lg bg-[#26262d] text-white font-semibold active" data-tier="all">All Tiers</button>
+              <button class="tab-tier-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-tier="platinum">Platinum</button>
+              <button class="tab-tier-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-tier="gold">Gold</button>
+              <button class="tab-tier-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-tier="silver">Silver</button>
+              <button class="tab-tier-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-tier="bronze">Bronze</button>
+            </div>
           </div>
         </div>
 
-        <!-- Customer CRM Data Table -->
+        <!-- Customer Table -->
         <div class="nova-card overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs text-[#85858f]">
               <thead class="bg-[#242429] text-[#6b6c77] font-medium border-b border-[rgba(255,255,255,0.04)] uppercase text-[10px] tracking-wider">
                 <tr>
                   <th class="py-3 px-4">Patron Name</th>
-                  <th class="py-3 px-4">Phone</th>
+                  <th class="py-3 px-4">Contact Details</th>
                   <th class="py-3 px-4">Loyalty Tier</th>
+                  <th class="py-3 px-4">Account Status</th>
                   <th class="py-3 px-4">Visits</th>
                   <th class="py-3 px-4">Lifetime Spend</th>
                   <th class="py-3 px-4">Reward Points</th>
@@ -839,160 +1072,288 @@
       </section>
 
       <!-- ================================================================== -->
-      <!-- VIEW 5: RESERVATIONS & REFUND DESK                                 -->
-      <!-- ================================================================== -->
-      <section id="view-reservations" class="view-container hidden space-y-6 max-w-7xl mx-auto">
-        
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="text-xl font-bold text-white">Reservations Ledger & Refund Desk</h2>
-            <p class="text-xs text-[#85858f]">Complete transaction records, seat allocations, digital pass re-issuance, and one-click refund desk</p>
-          </div>
-        </div>
-
-        <!-- Filter & Search Controls -->
-        <div class="nova-card p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div class="relative w-full md:w-80">
-            <i data-lucide="search" class="w-4 h-4 text-[#6b6c77] absolute left-3 top-2.5"></i>
-            <input 
-              type="text" 
-              id="reservation-search-filter" 
-              placeholder="Search by CP-XXXX, customer name, movie, seat..." 
-              class="w-full h-9 pl-9 pr-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange"
-            />
-          </div>
-
-          <!-- Status Filter Tabs -->
-          <div class="flex items-center gap-1.5 text-xs">
-            <button class="tab-res-filter px-3 py-1.5 rounded-lg bg-[#26262d] text-white font-semibold active" data-status="all">All Transactions</button>
-            <button class="tab-res-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-status="confirmed">Confirmed</button>
-            <button class="tab-res-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-status="refunded">Refunded / Cancelled</button>
-          </div>
-        </div>
-
-        <!-- Reservations Ledger Table -->
-        <div class="nova-card overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-[#85858f]">
-              <thead class="bg-[#242429] text-[#6b6c77] font-medium border-b border-[rgba(255,255,255,0.04)] uppercase text-[10px] tracking-wider">
-                <tr>
-                  <th class="py-3 px-4">Booking ID</th>
-                  <th class="py-3 px-4">Patron Name</th>
-                  <th class="py-3 px-4">Movie Title</th>
-                  <th class="py-3 px-4">Screen & Slot</th>
-                  <th class="py-3 px-4">Allocated Seats</th>
-                  <th class="py-3 px-4">Amount</th>
-                  <th class="py-3 px-4">Payment</th>
-                  <th class="py-3 px-4">Status</th>
-                  <th class="py-3 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="reservations-ledger-tbody" class="divide-y divide-[rgba(255,255,255,0.04)]"></tbody>
-            </table>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ================================================================== -->
-      <!-- VIEW 6: SETTINGS & SYSTEM DATA MANAGEMENT                          -->
+      <!-- VIEW 7: PROFILE & SETTINGS                                         -->
       <!-- ================================================================== -->
       <section id="view-settings" class="view-container hidden space-y-6 max-w-7xl mx-auto">
         
         <div>
-          <h2 class="text-xl font-bold text-white">System Data, Backup & Theater Settings</h2>
-          <p class="text-xs text-[#85858f]">Configure theater parameters, pricing taxes, active operator, and export/restore database state</p>
+          <h2 class="text-xl font-bold text-white">Profile & Settings</h2>
+          <p class="text-xs text-[#85858f]">Admin profile, account details, password change, and notification preferences</p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          <!-- Cinema Configuration Form -->
-          <div class="lg:col-span-2 nova-card p-6 space-y-4">
-            <h3 class="font-bold text-white text-sm pb-2 border-b border-[rgba(255,255,255,0.05)] flex items-center gap-2">
-              <i data-lucide="sliders" class="w-4 h-4 text-novaOrange"></i>
-              <span>Theater Operational Configuration</span>
-            </h3>
+        <!-- Settings Sub-Navigation Tabs -->
+        <div class="flex items-center gap-1.5 border-b border-[rgba(255,255,255,0.06)] pb-3">
+          <button class="tab-settings-nav px-4 py-2 rounded-xl text-xs font-semibold bg-[#24242a] text-white transition" data-panel="profile">
+            Admin Profile & Account
+          </button>
+          <button class="tab-settings-nav px-4 py-2 rounded-xl text-xs font-semibold text-[#85858f] hover:text-white transition" data-panel="password">
+            Security & Password Change
+          </button>
+          <button class="tab-settings-nav px-4 py-2 rounded-xl text-xs font-semibold text-[#85858f] hover:text-white transition" data-panel="notifications">
+            Notification Preferences
+          </button>
+          <button class="tab-settings-nav px-4 py-2 rounded-xl text-xs font-semibold text-[#85858f] hover:text-white transition" data-panel="system">
+            Cinema Parameters & Backup
+          </button>
+        </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Panel 1: Admin Profile -->
+        <div id="settings-panel-profile" class="settings-subpanel space-y-6">
+          <div class="nova-card p-6 space-y-5">
+            <div class="flex items-center gap-4 pb-4 border-b border-[rgba(255,255,255,0.05)]">
+              <img id="admin-profile-avatar-preview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" class="w-16 h-16 rounded-2xl object-cover border-2 border-novaOrange shadow-lg" alt="Admin" />
               <div>
-                <label class="block text-xs font-semibold text-[#85858f] mb-1">Cinema Chain Name</label>
-                <input type="text" id="setting-cinema-name" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-[#85858f] mb-1">Hall / Complex Location</label>
-                <input type="text" id="setting-cinema-location" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-[#85858f] mb-1">Currency Symbol</label>
-                <input type="text" id="setting-currency" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-[#85858f] mb-1">Default Ticket Tax Rate (%)</label>
-                <input type="number" step="0.1" id="setting-tax-rate" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-[#85858f] mb-1">Booking Convenience Fee ($)</label>
-                <input type="number" step="0.25" id="setting-booking-fee" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-[#85858f] mb-1">Active Box Office Lead Operator</label>
-                <input type="text" id="setting-active-staff" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+                <h3 id="admin-profile-name-heading" class="text-base font-bold text-white">Marcus Vance</h3>
+                <span id="admin-profile-role-heading" class="text-xs text-novaOrange font-medium block">Lead Operations & Sales Manager</span>
+                <span class="text-[11px] text-[#6b6c77] mt-0.5 block">CinePulse Enterprise Administration</span>
               </div>
             </div>
 
-            <div class="pt-3 border-t border-[rgba(255,255,255,0.05)] flex justify-end">
-              <button id="btn-save-settings" class="px-5 py-2.5 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-bold text-xs transition shadow-lg shadow-novaOrange/20">
-                Save Configurations
+            <form id="form-admin-profile" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-[#85858f] mb-1">Full Name</label>
+                  <input type="text" id="setting-admin-name" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#85858f] mb-1">Email Address</label>
+                  <input type="email" id="setting-admin-email" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#85858f] mb-1">Phone Number</label>
+                  <input type="text" id="setting-admin-phone" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#85858f] mb-1">Role / Executive Title</label>
+                  <input type="text" id="setting-admin-role" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#85858f] mb-1">Assigned Theatre Complex</label>
+                  <input type="text" id="setting-admin-complex" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#85858f] mb-1">Department</label>
+                  <input type="text" id="setting-admin-dept" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-[#85858f] mb-1">Avatar Image URL</label>
+                <input type="url" id="setting-admin-avatar" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+              </div>
+
+              <div class="pt-3 border-t border-[rgba(255,255,255,0.05)] flex justify-end">
+                <button type="submit" id="btn-save-admin-profile" class="px-5 py-2.5 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-bold text-xs transition shadow-lg shadow-novaOrange/20">
+                  Save Profile Details
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Panel 2: Password Change -->
+        <div id="settings-panel-password" class="settings-subpanel hidden space-y-6">
+          <div class="nova-card p-6 space-y-5 max-w-xl">
+            <div class="pb-3 border-b border-[rgba(255,255,255,0.05)]">
+              <h3 class="font-bold text-white text-sm">Rotate Admin Password</h3>
+              <p class="text-xs text-[#85858f] mt-0.5">Ensure your account password adheres to cinema enterprise security standards</p>
+            </div>
+
+            <form id="form-admin-password" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-[#85858f] mb-1">Current Password *</label>
+                <input type="password" id="setting-old-password" required placeholder="Enter current password" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-[#85858f] mb-1">New Password *</label>
+                <input type="password" id="setting-new-password" required placeholder="Min 6 characters" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-[#85858f] mb-1">Confirm New Password *</label>
+                <input type="password" id="setting-confirm-password" required placeholder="Re-type new password" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+              </div>
+
+              <div class="pt-3 border-t border-[rgba(255,255,255,0.05)] flex justify-end">
+                <button type="submit" id="btn-change-password" class="px-5 py-2.5 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-bold text-xs transition shadow-lg shadow-novaOrange/20">
+                  Update Password
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Panel 3: Notification Preferences -->
+        <div id="settings-panel-notifications" class="settings-subpanel hidden space-y-6">
+          <div class="nova-card p-6 space-y-5">
+            <div class="pb-3 border-b border-[rgba(255,255,255,0.05)]">
+              <h3 class="font-bold text-white text-sm">Operational Notification Preferences</h3>
+              <p class="text-xs text-[#85858f] mt-0.5">Control live notifications for box office events, bookings, and threshold telemetry</p>
+            </div>
+
+            <div class="space-y-4 divide-y divide-[rgba(255,255,255,0.04)]">
+              <!-- Item 1: High Value -->
+              <div class="pt-4 flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-semibold text-white block">High-Value Booking Alerts</span>
+                  <span class="text-[11px] text-[#85858f]">Receive instant alerts for bulk bookings or transactions exceeding $50</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="notif-toggle-highvalue" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <!-- Item 2: Low Capacity -->
+              <div class="pt-4 flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-semibold text-white block">Low Seat Capacity Warnings</span>
+                  <span class="text-[11px] text-[#85858f]">Trigger alert when auditorium availability drops below 15%</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="notif-toggle-lowcapacity" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <!-- Item 3: Refunds -->
+              <div class="pt-4 flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-semibold text-white block">Cancellation & Refund Notifications</span>
+                  <span class="text-[11px] text-[#85858f]">Notify whenever staff or patrons process ticket cancellations and seat releases</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="notif-toggle-refunds" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <!-- Item 4: Daily Digest -->
+              <div class="pt-4 flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-semibold text-white block">Daily Operations Summary Digest</span>
+                  <span class="text-[11px] text-[#85858f]">Receive aggregated ticket sales and revenue report at shift end</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="notif-toggle-digest" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <!-- Item 5: Sound Effects -->
+              <div class="pt-4 flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-semibold text-white block">Audible POS Confirmation Chimes</span>
+                  <span class="text-[11px] text-[#85858f]">Play subtle audio tone when tickets are printed or reservations confirmed</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="notif-toggle-chimes" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-[rgba(255,255,255,0.05)] flex justify-end">
+              <button id="btn-save-notifications" class="px-5 py-2.5 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-bold text-xs transition shadow-lg shadow-novaOrange/20">
+                Save Notification Preferences
               </button>
             </div>
           </div>
+        </div>
 
-          <!-- Backup & Recovery Utilities -->
-          <div class="nova-card p-6 flex flex-col justify-between space-y-5">
-            <div>
+        <!-- Panel 4: System Parameters & Backup -->
+        <div id="settings-panel-system" class="settings-subpanel hidden space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Cinema Configuration Form -->
+            <div class="lg:col-span-2 nova-card p-6 space-y-4">
               <h3 class="font-bold text-white text-sm pb-2 border-b border-[rgba(255,255,255,0.05)] flex items-center gap-2">
-                <i data-lucide="database" class="w-4 h-4 text-[#2dd4bf]"></i>
-                <span>Database Backup & Diagnostics</span>
+                <i data-lucide="sliders" class="w-4 h-4 text-novaOrange"></i>
+                <span>Theater Operational Configuration</span>
               </h3>
 
-              <div class="p-4 rounded-xl bg-[#17181c] border border-[rgba(255,255,255,0.05)] my-4 space-y-2.5 text-xs">
-                <div class="flex justify-between">
-                  <span class="text-[#85858f]">Database Engine:</span>
-                  <span class="font-mono text-white">Browser LocalStorage</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-[#85858f] mb-1">Cinema Chain Name</label>
+                  <input type="text" id="setting-cinema-name" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
                 </div>
-                <div class="flex justify-between">
-                  <span class="text-[#85858f]">Storage Footprint:</span>
-                  <span id="diag-storage-size" class="font-mono text-[#2dd4bf] font-bold">0 KB</span>
+                <div>
+                  <label class="block text-xs font-semibold text-[#85858f] mb-1">Hall / Complex Location</label>
+                  <input type="text" id="setting-cinema-location" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
                 </div>
-                <div class="flex justify-between">
-                  <span class="text-[#85858f]">Total Records:</span>
-                  <span id="diag-total-records" class="font-mono text-white">0 records</span>
+                <div>
+                  <label class="block text-xs font-semibold text-[#85858f] mb-1">Currency Symbol</label>
+                  <input type="text" id="setting-currency" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#85858f] mb-1">Default Ticket Tax Rate (%)</label>
+                  <input type="number" step="0.1" id="setting-tax-rate" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#85858f] mb-1">Booking Convenience Fee ($)</label>
+                  <input type="number" step="0.25" id="setting-booking-fee" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-[#85858f] mb-1">Active Box Office Lead Operator</label>
+                  <input type="text" id="setting-active-staff" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
                 </div>
               </div>
 
-              <div class="space-y-2.5">
-                <button id="btn-export-backup" class="w-full py-2.5 px-3 rounded-xl bg-[#222227] hover:bg-[#2b2b32] text-white font-semibold text-xs transition flex items-center justify-center gap-2">
-                  <i data-lucide="download" class="w-4 h-4 text-novaOrange"></i>
-                  <span>Export Database (JSON Backup)</span>
+              <div class="pt-3 border-t border-[rgba(255,255,255,0.05)] flex justify-end">
+                <button id="btn-save-settings" class="px-5 py-2.5 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-bold text-xs transition shadow-lg shadow-novaOrange/20">
+                  Save Configurations
                 </button>
-
-                <button id="btn-import-backup" class="w-full py-2.5 px-3 rounded-xl bg-[#222227] hover:bg-[#2b2b32] text-white font-semibold text-xs transition flex items-center justify-center gap-2">
-                  <i data-lucide="upload" class="w-4 h-4 text-[#2dd4bf]"></i>
-                  <span>Restore from JSON File</span>
-                </button>
-                <input type="file" id="import-file-input" accept=".json" class="hidden" />
               </div>
             </div>
 
-            <div class="pt-4 border-t border-[rgba(255,255,255,0.05)]">
-              <button id="btn-reset-demo-data" class="w-full py-2.5 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-semibold text-xs transition flex items-center justify-center gap-2">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                <span>Reset to Sample Demo Data</span>
-              </button>
+            <!-- Backup & Recovery Utilities -->
+            <div class="nova-card p-6 flex flex-col justify-between space-y-5">
+              <div>
+                <h3 class="font-bold text-white text-sm pb-2 border-b border-[rgba(255,255,255,0.05)] flex items-center gap-2">
+                  <i data-lucide="database" class="w-4 h-4 text-[#2dd4bf]"></i>
+                  <span>Database Backup & Diagnostics</span>
+                </h3>
+
+                <div class="p-4 rounded-xl bg-[#17181c] border border-[rgba(255,255,255,0.05)] my-4 space-y-2.5 text-xs">
+                  <div class="flex justify-between">
+                    <span class="text-[#85858f]">Database Engine:</span>
+                    <span class="font-mono text-white">Browser LocalStorage</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-[#85858f]">Storage Footprint:</span>
+                    <span id="diag-storage-size" class="font-mono text-[#2dd4bf] font-bold">0 KB</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-[#85858f]">Total Records:</span>
+                    <span id="diag-total-records" class="font-mono text-white">0 records</span>
+                  </div>
+                </div>
+
+                <div class="space-y-2.5">
+                  <button id="btn-export-backup" class="w-full py-2.5 px-3 rounded-xl bg-[#222227] hover:bg-[#2b2b32] text-white font-semibold text-xs transition flex items-center justify-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4 text-novaOrange"></i>
+                    <span>Export Database (JSON Backup)</span>
+                  </button>
+
+                  <button id="btn-import-backup" class="w-full py-2.5 px-3 rounded-xl bg-[#222227] hover:bg-[#2b2b32] text-white font-semibold text-xs transition flex items-center justify-center gap-2">
+                    <i data-lucide="upload" class="w-4 h-4 text-[#2dd4bf]"></i>
+                    <span>Restore from JSON File</span>
+                  </button>
+                  <input type="file" id="import-file-input" accept=".json" class="hidden" />
+                </div>
+              </div>
+
+              <div class="pt-4 border-t border-[rgba(255,255,255,0.05)]">
+                <button id="btn-reset-demo-data" class="w-full py-2.5 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-semibold text-xs transition flex items-center justify-center gap-2">
+                  <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                  <span>Reset to Sample Demo Data</span>
+                </button>
+              </div>
+
             </div>
 
           </div>
-
         </div>
 
       </section>
@@ -1044,6 +1405,7 @@
       </div>
 
       <form id="form-movie" class="space-y-3.5">
+        <input type="hidden" id="movie-input-id" value="" />
         <div>
           <label class="block text-xs font-semibold text-[#85858f] mb-1">Movie Title *</label>
           <input type="text" id="movie-input-title" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="e.g. Dune: Part Two" />
@@ -1088,13 +1450,18 @@
             <input type="text" id="movie-input-director" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="Denis Villeneuve" />
           </div>
           <div>
-            <label class="block text-xs font-semibold text-[#85858f] mb-1">Status</label>
-            <select id="movie-input-status" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange">
-              <option value="Active">Active Rotation</option>
-              <option value="Coming Soon">Coming Soon</option>
-              <option value="Archived">Archived</option>
-            </select>
+            <label class="block text-xs font-semibold text-[#85858f] mb-1">Release Date</label>
+            <input type="date" id="movie-input-releasedate" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
           </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Status</label>
+          <select id="movie-input-status" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange">
+            <option value="Active">Active Rotation</option>
+            <option value="Coming Soon">Coming Soon</option>
+            <option value="Archived">Archived</option>
+          </select>
         </div>
 
         <div>
@@ -1165,6 +1532,65 @@
         <div class="pt-3 border-t border-[rgba(255,255,255,0.06)] flex justify-end gap-2">
           <button type="button" class="modal-dismiss-btn px-4 py-2 rounded-xl bg-[#222227] hover:bg-[#2c2c34] text-[#85858f] hover:text-white text-xs font-semibold">Cancel</button>
           <button type="submit" class="px-5 py-2 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white text-xs font-bold transition">Confirm Showtime</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- MODAL: ADD / EDIT SCREEN & AUDITORIUM                                  -->
+  <!-- ====================================================================== -->
+  <div id="modal-screen-form" class="modal-wrapper hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 drawer-backdrop modal-dismiss-btn"></div>
+    <div class="relative bg-[#1c1c21] border border-[rgba(255,255,255,0.08)] shadow-2xl rounded-2xl w-full max-w-md z-10 p-6 fade-in-scale">
+      <div class="flex items-center justify-between pb-3 border-b border-[rgba(255,255,255,0.06)] mb-4">
+        <h3 id="modal-screen-title" class="font-bold text-white text-base">Add New Screen</h3>
+        <button class="modal-dismiss-btn text-[#85858f] hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-screen" class="space-y-3.5">
+        <input type="hidden" id="screen-input-id" value="" />
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Screen Name *</label>
+          <input type="text" id="screen-input-name" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="Screen 4 - Dolby Atmos Prime" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Theatre Location Complex *</label>
+          <select id="screen-input-theatre" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange font-medium">
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Projection & Sound Spec *</label>
+          <select id="screen-input-type" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange font-medium">
+            <option value="IMAX Laser">IMAX Dual 4K Laser + 12-Ch Audio</option>
+            <option value="Dolby Atmos">Dolby Atmos Prime + 4K RGB Laser</option>
+            <option value="Luxe Recliner">VIP Luxe Plush Recliner Soundstage</option>
+            <option value="Standard 4K">Standard Barco 4K Digital Cinema</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-[#85858f] mb-1">Total Seats *</label>
+            <input type="number" id="screen-input-seats" required min="10" max="400" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="60" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#85858f] mb-1">Availability Status</label>
+            <select id="screen-input-availability" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange font-medium">
+              <option value="Available">Available</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Cleaning">Cleaning</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-[rgba(255,255,255,0.06)] flex justify-end gap-2">
+          <button type="button" class="modal-dismiss-btn px-4 py-2 rounded-xl bg-[#222227] hover:bg-[#2c2c34] text-[#85858f] hover:text-white text-xs font-semibold">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white text-xs font-bold transition">Save Screen</button>
         </div>
       </form>
     </div>
