@@ -1,0 +1,589 @@
+/* ==========================================================================
+   NovaCine / NovaCRM Cinema - Minimalist Luxury Dark Theme
+   Inspired by NovaCRM iPhone-commercial aesthetics
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Matte Obsidian / Graphite Palette */
+  --bg-app: #101114;
+  --bg-sidebar: #151619;
+  --bg-card: #1c1c21;
+  --bg-card-elevated: #222227;
+  --bg-card-hover: #26262d;
+  --bg-input: #17181c;
+  
+  /* Borders */
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-medium: rgba(255, 255, 255, 0.09);
+  --border-focus: rgba(255, 93, 42, 0.5);
+
+  /* Signature Nova Coral / Orange */
+  --nova-orange: #ff5d2a;
+  --nova-orange-hover: #ff703f;
+  --nova-orange-glow: rgba(255, 93, 42, 0.35);
+  --nova-orange-subtle: rgba(255, 93, 42, 0.12);
+
+  /* Accents */
+  --accent-green: #22c55e;
+  --accent-yellow: #fbbf24;
+  --accent-teal: #2dd4bf;
+  --accent-purple: #818cf8;
+  --accent-red: #ef4444;
+
+  /* Typography */
+  --text-primary: #ffffff;
+  --text-secondary: #9a9ba6;
+  --text-muted: #6b6c77;
+
+  /* Radii */
+  --radius-card: 20px;
+  --radius-pill: 9999px;
+  --radius-btn: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* --- Sleek Minimalist Scrollbar --- */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 93, 42, 0.4);
+}
+
+/* --- Cards (iPhone-like Squircle Rounded Minimal Containers) --- */
+.nova-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.nova-card:hover {
+  border-color: var(--border-medium);
+}
+
+.nova-card-elevated {
+  background-color: var(--bg-card-elevated);
+}
+
+/* --- Pill Badges & Chips --- */
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.pill-orange {
+  background: rgba(255, 93, 42, 0.12);
+  color: #ff703f;
+  border: 1px solid rgba(255, 93, 42, 0.25);
+}
+
+.pill-green {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.22);
+}
+
+.pill-yellow {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
+.pill-purple {
+  background: rgba(129, 140, 248, 0.12);
+  color: #a5b4fc;
+  border: 1px solid rgba(129, 140, 248, 0.25);
+}
+
+.pill-teal {
+  background: rgba(45, 212, 191, 0.12);
+  color: #2dd4bf;
+  border: 1px solid rgba(45, 212, 191, 0.25);
+}
+
+.pill-dark {
+  background: #232328;
+  color: #a1a1aa;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pill-dark:hover, .pill-dark.active {
+  background: #2c2c34;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* --- Semi-Circular Donut Gauge Chart (Photo 1) --- */
+.semi-donut-wrapper {
+  position: relative;
+  width: 220px;
+  height: 125px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.semi-donut-svg {
+  width: 220px;
+  height: 220px;
+  transform: rotate(-90deg);
+}
+
+/* --- Vertical Capsule Bars (Photo 2) --- */
+.capsule-bar-trough {
+  width: 44px;
+  height: 140px;
+  background-color: #26262c;
+  border-radius: 9999px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.capsule-bar-fill {
+  width: 100%;
+  background: var(--nova-orange);
+  border-radius: 9999px;
+  transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- Cinema Auditorium Screen Graphic --- */
+.screen-projection-beam {
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 93, 42, 0.15) 0%, rgba(255, 93, 42, 0.03) 55%, transparent 75%);
+}
+
+.cinema-curved-screen {
+  position: relative;
+  height: 8px;
+  border-radius: 50% / 100% 100% 0 0;
+  background: linear-gradient(90deg, rgba(255, 93, 42, 0.2) 0%, #ff5d2a 30%, #fff 50%, #ff5d2a 70%, rgba(255, 93, 42, 0.2) 100%);
+  box-shadow: 0 0 20px rgba(255, 93, 42, 0.65), 0 0 35px rgba(255, 93, 42, 0.25);
+}
+
+.cinema-curved-screen::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 10%;
+  right: 10%;
+  height: 22px;
+  background: linear-gradient(180deg, rgba(255, 93, 42, 0.12) 0%, transparent 100%);
+  filter: blur(4px);
+}
+
+/* --- Seat Matrix Elements --- */
+.seat-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px 7px 4px 4px;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.seat-btn::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  right: 3px;
+  height: 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.seat-available-vip {
+  background: #232238;
+  border: 1px solid #6366f1;
+  color: #c7d2fe;
+}
+.seat-available-vip:hover {
+  background: #4338ca;
+  color: #ffffff;
+  transform: translateY(-2px) scale(1.1);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+}
+
+.seat-available-standard {
+  background: #232328;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #d1d5db;
+}
+.seat-available-standard:hover {
+  background: #33333c;
+  color: #ffffff;
+  transform: translateY(-2px) scale(1.1);
+  box-shadow: 0 0 10px rgba(255, 93, 42, 0.4);
+}
+
+.seat-available-accessible {
+  background: #172a2e;
+  border: 1px solid #14b8a6;
+  color: #99f6e4;
+}
+.seat-available-accessible:hover {
+  background: #0d9488;
+  color: #ffffff;
+  transform: translateY(-2px) scale(1.1);
+}
+
+.seat-booked {
+  background: #16171b;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: #4b4b57;
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.seat-booked::after {
+  content: '✕';
+  position: absolute;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ef4444;
+  opacity: 0.6;
+}
+
+.seat-selected {
+  background: var(--nova-orange) !important;
+  border: 1px solid #ffbe98 !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+  transform: translateY(-3px) scale(1.12);
+  box-shadow: 0 0 16px rgba(255, 93, 42, 0.8), 0 0 30px rgba(255, 93, 42, 0.35) !important;
+  animation: seatPulse 1.8s infinite alternate;
+}
+.seat-selected::before {
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+
+@keyframes seatPulse {
+  0% { box-shadow: 0 0 10px rgba(255, 93, 42, 0.6); }
+  100% { box-shadow: 0 0 24px rgba(255, 93, 42, 0.95); }
+}
+
+/* --- Perforated Ticket Stub Styling --- */
+.ticket-stub-card {
+  position: relative;
+  background: #18191e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.ticket-notch-left, .ticket-notch-right {
+  position: absolute;
+  top: 68%;
+  width: 24px;
+  height: 24px;
+  background-color: var(--bg-app);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+.ticket-notch-left {
+  left: -12px;
+  box-shadow: inset -2px 0 3px rgba(0,0,0,0.4);
+}
+.ticket-notch-right {
+  right: -12px;
+  box-shadow: inset 2px 0 3px rgba(0,0,0,0.4);
+}
+
+.ticket-perforation-line {
+  position: absolute;
+  top: 68%;
+  left: 15px;
+  right: 15px;
+  height: 1px;
+  border-top: 2px dashed rgba(255, 255, 255, 0.15);
+}
+
+.simulated-barcode {
+  background: repeating-linear-gradient(
+    90deg,
+    #f8fafc,
+    #f8fafc 2px,
+    transparent 2px,
+    transparent 5px,
+    #f8fafc 5px,
+    #f8fafc 9px,
+    transparent 9px,
+    transparent 11px,
+    #f8fafc 11px,
+    #f8fafc 15px
+  );
+  height: 38px;
+  width: 100%;
+}
+
+/* --- Drawer & Modal Transition Animations --- */
+.drawer-backdrop {
+  background: rgba(10, 11, 14, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.slide-in-right {
+  animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.fade-in-scale {
+  animation: fadeInScale 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Print Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #ticket-print-target, #ticket-print-target * {
+    visibility: visible;
+  }
+  #ticket-print-target {
+    position: fixed;
+    left: 50%;
+    top: 50px;
+    transform: translateX(-50%);
+    width: 380px !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    box-shadow: none !important;
+  }
+  #ticket-print-target .ticket-notch-left,
+  #ticket-print-target .ticket-notch-right {
+    background: #ffffff !important;
+  }
+  #ticket-print-target .simulated-barcode {
+    background: repeating-linear-gradient(
+      90deg,
+      #000000,
+      #000000 2px,
+      transparent 2px,
+      transparent 5px,
+      #000000 5px,
+      #000000 9px,
+      transparent 9px,
+      transparent 11px,
+      #000000 11px,
+      #000000 15px
+    ) !important;
+  }
+}
+
+/* ==========================================================================
+   NOVACRM PORCELAIN LIGHT MODE THEME
+   Crisp, Minimalist Apple-Commercial Light Aesthetic
+   ========================================================================== */
+
+html.light, html:not(.dark) {
+  --bg-app: #f4f5f8;
+  --bg-sidebar: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-elevated: #f8f9fa;
+  --bg-card-hover: #f1f3f7;
+  --bg-input: #f1f3f7;
+
+  --border-subtle: rgba(0, 0, 0, 0.07);
+  --border-medium: rgba(0, 0, 0, 0.12);
+  --border-focus: rgba(255, 93, 42, 0.6);
+
+  --nova-orange: #ff5d2a;
+  --nova-orange-hover: #e04818;
+  --nova-orange-glow: rgba(255, 93, 42, 0.25);
+  --nova-orange-subtle: rgba(255, 93, 42, 0.1);
+
+  --accent-green: #16a34a;
+  --accent-yellow: #d97706;
+  --accent-teal: #0d9488;
+  --accent-purple: #6366f1;
+  --accent-red: #dc2626;
+
+  --text-primary: #121316;
+  --text-secondary: #5a5d6e;
+  --text-muted: #8b8e9d;
+}
+
+/* Light Mode System Overrides */
+html.light body, html:not(.dark) body {
+  background-color: #f4f5f8 !important;
+  color: #121316 !important;
+}
+
+html.light aside#main-sidebar, html:not(.dark) aside#main-sidebar {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+}
+
+html.light header, html:not(.dark) header {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+}
+
+html.light main, html:not(.dark) main {
+  background-color: #f4f5f8 !important;
+}
+
+html.light .nova-card, html:not(.dark) .nova-card {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.035);
+}
+
+html.light .nova-card:hover, html:not(.dark) .nova-card:hover {
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+html.light .text-white, html:not(.dark) .text-white {
+  color: #121316 !important;
+}
+
+html.light .text-\[\#85858f\], html:not(.dark) .text-\[\#85858f\] {
+  color: #5d6070 !important;
+}
+
+html.light .text-\[\#6b6c77\], html:not(.dark) .text-\[\#6b6c77\] {
+  color: #888b9c !important;
+}
+
+html.light .text-\[\#a0a0ab\], html:not(.dark) .text-\[\#a0a0ab\] {
+  color: #4b4f5d !important;
+}
+
+html.light .bg-\[\#18191d\], html:not(.dark) .bg-\[\#18191d\] {
+  background-color: #edeef2 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light .bg-\[\#1c1c21\], html:not(.dark) .bg-\[\#1c1c21\] {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+}
+
+html.light .bg-\[\#222227\], html:not(.dark) .bg-\[\#222227\] {
+  background-color: #f2f3f7 !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+  color: #121316 !important;
+}
+
+html.light .bg-\[\#24242a\], html:not(.dark) .bg-\[\#24242a\] {
+  background-color: #edeef3 !important;
+  color: #121316 !important;
+}
+
+html.light .bg-\[\#242429\], html:not(.dark) .bg-\[\#242429\] {
+  background-color: #f6f7fa !important;
+  color: #5d6070 !important;
+}
+
+html.light .bg-\[\#26262d\], html:not(.dark) .bg-\[\#26262d\] {
+  background-color: #ffffff !important;
+  color: #121316 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light .bg-\[\#26262c\], html:not(.dark) .bg-\[\#26262c\] {
+  background-color: #e5e7eb !important;
+}
+
+html.light .bg-\[\#17181c\], html:not(.dark) .bg-\[\#17181c\] {
+  background-color: #f4f5f8 !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+}
+
+html.light input, html.light select, html:not(.dark) input, html:not(.dark) select {
+  background-color: #f0f2f6 !important;
+  color: #121316 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light input::placeholder, html:not(.dark) input::placeholder {
+  color: #9da0af !important;
+}
+
+html.light .pill-dark, html:not(.dark) .pill-dark {
+  background: #f0f2f6 !important;
+  color: #5d6070 !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light .pill-dark:hover, html.light .pill-dark.active,
+html:not(.dark) .pill-dark:hover, html:not(.dark) .pill-dark.active {
+  background: #121316 !important;
+  color: #ffffff !important;
+}
+
+html.light tr:hover, html:not(.dark) tr:hover {
+  background-color: #f7f8fc !important;
+}
+
+html.light .divide-\[rgba\(255\,255\,255\,0\.03\)\], html:not(.dark) .divide-\[rgba\(255\,255\,255\,0\.03\)\] {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light .border-\[rgba\(255\,255\,255\,0\.04\)\], html:not(.dark) .border-\[rgba\(255\,255\,255\,0\.04\)\],
+html.light .border-\[rgba\(255\,255\,255\,0\.05\)\], html:not(.dark) .border-\[rgba\(255\,255\,255\,0\.05\)\],
+html.light .border-\[rgba\(255\,255\,255\,0\.06\)\], html:not(.dark) .border-\[rgba\(255\,255\,255\,0\.06\)\],
+html.light .border-\[rgba\(255\,255\,255\,0\.08\)\], html:not(.dark) .border-\[rgba\(255\,255\,255\,0\.08\)\] {
+  border-color: rgba(0, 0, 0, 0.07) !important;
+}
+
+html.light .capsule-bar-trough, html:not(.dark) .capsule-bar-trough {
+  background-color: #eaecf1 !important;
+}
+
+html.light .gauge-inner-cutout, html:not(.dark) .gauge-inner-cutout {
+  fill: #ffffff !important;
+}

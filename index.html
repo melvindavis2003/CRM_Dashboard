@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NovaCRM — Cinema Operations & Customer CRM Dashboard</title>
+  <meta name="description" content="Minimalist, luxury cinema operations and customer CRM dashboard inspired by NovaCRM aesthetics." />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            novaBg: '#101114',
+            novaSidebar: '#151619',
+            novaCard: '#1c1c21',
+            novaCardElevated: '#222227',
+            novaBorder: 'rgba(255, 255, 255, 0.05)',
+            novaOrange: {
+              DEFAULT: '#ff5d2a',
+              hover: '#ff703f',
+              glow: 'rgba(255, 93, 42, 0.35)',
+              subtle: 'rgba(255, 93, 42, 0.12)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="bg-[#101114] text-white min-h-screen flex antialiased select-none font-sans">
+
+  <!-- ====================================================================== -->
+  <!-- SIDEBAR: NOVACRM MINIMALIST COLLAPSIBLE NAVIGATION                     -->
+  <!-- ====================================================================== -->
+  <aside id="main-sidebar" class="w-60 bg-[#151619] border-r border-[rgba(255,255,255,0.05)] flex flex-col justify-between transition-all duration-300 z-30 flex-shrink-0 select-none">
+    <div class="p-5 flex flex-col space-y-6">
+      
+      <!-- Logo: Folded Ribbon/Origami Mark + NovaCRM -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 6L11 3L18 8L11 12L4 6Z" fill="#ff5d2a"/>
+            <path d="M11 12L18 8L20 15L13 19L11 12Z" fill="#e04818"/>
+            <path d="M4 6L11 12L9 19L2 13L4 6Z" fill="#ff7a45"/>
+          </svg>
+        </div>
+        <div class="sidebar-text leading-tight">
+          <span class="font-bold text-white text-lg tracking-tight flex items-center gap-1.5">
+            NovaCRM
+          </span>
+          <span class="text-[10px] text-[#6b6c77] font-medium tracking-wide block uppercase">Cinema Edition</span>
+        </div>
+      </div>
+
+      <!-- Hide / Collapse Button -->
+      <div>
+        <button id="sidebar-toggle-btn" class="flex items-center gap-2 text-xs font-medium text-[#85858f] hover:text-white transition py-1 px-1 rounded-lg">
+          <svg class="w-4 h-4 text-[#85858f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+          <span class="sidebar-text">Hide</span>
+        </button>
+      </div>
+
+      <!-- Primary Navigation Links -->
+      <nav class="space-y-1">
+        <a href="#overview" data-view="overview" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition bg-[#24242a] text-white">
+          <i data-lucide="layout-grid" class="w-4 h-4 flex-shrink-0"></i>
+          <span class="sidebar-text">Dashboard</span>
+        </a>
+
+        <a href="#crm" data-view="crm" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
+          <i data-lucide="phone" class="w-4 h-4 flex-shrink-0"></i>
+          <span class="sidebar-text">Contacts</span>
+        </a>
+
+        <a href="#reservations" data-view="reservations" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
+          <i data-lucide="file-text" class="w-4 h-4 flex-shrink-0"></i>
+          <span class="sidebar-text">Reports</span>
+        </a>
+
+        <a href="#movies" data-view="movies" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
+          <i data-lucide="film" class="w-4 h-4 flex-shrink-0"></i>
+          <span class="sidebar-text">Movies & Shows</span>
+        </a>
+
+        <a href="#boxoffice" data-view="boxoffice" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
+          <i data-lucide="armchair" class="w-4 h-4 flex-shrink-0"></i>
+          <span class="sidebar-text">Box Office & Seats</span>
+        </a>
+
+        <a href="#settings" data-view="settings" class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition text-[#85858f] hover:text-white hover:bg-[#1c1c21]">
+          <i data-lucide="settings" class="w-4 h-4 flex-shrink-0"></i>
+          <span class="sidebar-text">Settings</span>
+        </a>
+      </nav>
+
+      <!-- Quick Actions Accordion -->
+      <div class="pt-2 sidebar-text">
+        <button id="quick-actions-toggle" class="w-full flex items-center justify-between text-xs font-semibold text-[#85858f] hover:text-white py-1 transition">
+          <span>Quick Actions</span>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200"></i>
+        </button>
+        <div id="quick-actions-menu" class="mt-2 space-y-1 pl-2">
+          <button id="quick-add-customer-btn" class="w-full text-left flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] text-[#90929e] hover:text-white hover:bg-[#1c1c21] transition">
+            <span class="text-novaOrange font-bold">+</span>
+            <span>New Contact</span>
+          </button>
+          <button id="quick-add-showtime-btn" class="w-full text-left flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] text-[#90929e] hover:text-white hover:bg-[#1c1c21] transition">
+            <span class="text-novaOrange font-bold">+</span>
+            <span>New Showtime</span>
+          </button>
+          <button id="quick-add-movie-btn" class="w-full text-left flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] text-[#90929e] hover:text-white hover:bg-[#1c1c21] transition">
+            <span class="text-novaOrange font-bold">+</span>
+            <span>New Movie</span>
+          </button>
+          <button id="quick-walkin-booking-btn" class="w-full text-left flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] text-[#90929e] hover:text-white hover:bg-[#1c1c21] transition">
+            <span class="text-novaOrange font-bold">+</span>
+            <span>Book Tickets</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Actions: 3 Clean Circular Buttons (Matching Photo 1 & 2) -->
+    <div class="p-5 flex items-center gap-3">
+      <button onclick="document.getElementById('quick-add-customer-btn').click()" class="w-9 h-9 rounded-full bg-[#1c1c21] hover:bg-[#25252b] border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-[#85858f] hover:text-white transition" title="Add Contact">
+        <i data-lucide="user-plus" class="w-4 h-4"></i>
+      </button>
+      <button onclick="switchView('settings')" class="w-9 h-9 rounded-full bg-[#1c1c21] hover:bg-[#25252b] border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-[#85858f] hover:text-white transition" title="Settings">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+      </button>
+      <button onclick="alert('NovaCRM Cinema Operations v2.4\nLead Operator: Marcus Vance\nHotkeys: Ctrl+K for Search')" class="w-9 h-9 rounded-full bg-[#1c1c21] hover:bg-[#25252b] border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-[#85858f] hover:text-white transition" title="Help & Docs">
+        <i data-lucide="help-circle" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ====================================================================== -->
+  <!-- MAIN WORKSPACE & TOP BAR                                               -->
+  <!-- ====================================================================== -->
+  <div class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden bg-[#101114]">
+    
+    <!-- Top Header Bar (Matching Photo 1 & 2) -->
+    <header class="h-16 px-8 flex items-center justify-between border-b border-[rgba(255,255,255,0.04)] bg-[#101114]/90 backdrop-blur-md z-20 flex-shrink-0">
+      
+      <!-- Left: Team Size with overlapping round avatars -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center -space-x-2">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" class="w-7 h-7 rounded-full object-cover border-2 border-[#101114]" alt="Rep 1" />
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80" class="w-7 h-7 rounded-full object-cover border-2 border-[#101114]" alt="Rep 2" />
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80" class="w-7 h-7 rounded-full object-cover border-2 border-[#101114]" alt="Rep 3" />
+        </div>
+        <div class="text-xs text-[#85858f] font-medium leading-none">
+          <span class="block text-[10px] text-[#6b6c77]">Team Size</span>
+          <span class="text-white font-semibold">6 sales reps</span>
+        </div>
+      </div>
+
+      <!-- Right: Notification, Search Pill, User Profile, Theme Sun -->
+      <div class="flex items-center gap-4">
+        
+        <!-- Notification Bell -->
+        <button id="btn-notifications" class="w-9 h-9 rounded-full bg-[#18191d] hover:bg-[#202026] border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-[#85858f] hover:text-white transition relative">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span class="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-novaOrange"></span>
+        </button>
+
+        <!-- Notification Dropdown -->
+        <div id="notifications-dropdown" class="hidden absolute right-32 top-14 w-80 bg-[#1c1c21] border border-[rgba(255,255,255,0.08)] shadow-2xl rounded-2xl z-50 overflow-hidden">
+          <div class="p-3 border-b border-[rgba(255,255,255,0.06)] flex items-center justify-between">
+            <span class="text-xs font-bold text-white">Live Operations Activity</span>
+            <span class="text-[10px] font-mono text-novaOrange">Real-time</span>
+          </div>
+          <div id="notifications-list" class="max-h-72 overflow-y-auto"></div>
+        </div>
+
+        <!-- Pill Search Input with Q on Right -->
+        <div class="relative w-64 md:w-72">
+          <input 
+            type="text" 
+            id="global-search-input" 
+            placeholder="Search" 
+            class="w-full h-9 pl-4 pr-9 rounded-full bg-[#18191d] border border-[rgba(255,255,255,0.06)] text-xs text-white placeholder-[#6b6c77] focus:outline-none focus:border-novaOrange transition"
+          />
+          <i data-lucide="search" class="w-3.5 h-3.5 text-[#6b6c77] absolute right-3.5 top-3 pointer-events-none"></i>
+          <!-- Global Search Popup Results Container -->
+          <div id="global-search-results" class="hidden absolute top-11 left-0 right-0 bg-[#1c1c21] border border-[rgba(255,255,255,0.08)] shadow-2xl rounded-xl z-50 overflow-hidden"></div>
+        </div>
+
+        <!-- User Profile Pill -->
+        <div class="flex items-center gap-2.5 pl-2">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" class="w-8 h-8 rounded-full object-cover border border-[rgba(255,255,255,0.1)]" alt="User Avatar" />
+          <div class="text-left leading-tight hidden sm:block">
+            <span class="text-[10px] text-[#6b6c77] block font-medium">User Role:</span>
+            <span class="text-xs font-semibold text-white">Sales Manager</span>
+          </div>
+        </div>
+
+        <!-- Theme Toggle Button (Sun in Dark, Moon in Light) -->
+        <button id="theme-toggle-btn" class="w-8 h-8 rounded-full bg-[#18191d] hover:bg-[#202026] border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-[#85858f] hover:text-white transition" title="Toggle Light / Dark Mode">
+          <i data-lucide="sun" class="w-4 h-4"></i>
+        </button>
+
+      </div>
+    </header>
+
+    <!-- Main Content Canvas -->
+    <main class="flex-1 overflow-y-auto p-6 md:p-8 bg-[#101114]">
+
+      <!-- ================================================================== -->
+      <!-- VIEW 1: NOVACRM EXECUTIVE DASHBOARD (PHOTOS 1 & 2)                 -->
+      <!-- ================================================================== -->
+      <section id="view-overview" class="view-container space-y-6 max-w-7xl mx-auto">
+        
+        <!-- ROW 1: TOP 4 METRIC / KPI CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Card 1: Active Deals -->
+          <div class="nova-card p-5 flex flex-col justify-between h-40">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-medium text-[#85858f]">Active Deals</span>
+              <span class="pill-badge pill-orange">
+                <i data-lucide="trending-up" class="w-3 h-3"></i> 37%
+              </span>
+            </div>
+            <div>
+              <h2 id="kpi-today-tickets" class="text-4xl font-bold tracking-tight text-white font-sans">86</h2>
+              <span class="text-[11px] text-[#6b6c77] mt-1 block">Active Screenings & Deals</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Pipeline Value (The Big Prominent Center Card) -->
+          <div class="nova-card p-5 flex flex-col justify-between h-40">
+            <div>
+              <h2 id="kpi-today-revenue" class="text-4xl font-bold tracking-tight text-white font-sans">$412,800</h2>
+            </div>
+            <div class="flex items-center justify-between pt-2">
+              <span class="text-xs font-medium text-[#85858f]">Pipeline Value</span>
+              <span class="pill-badge pill-green">
+                <i data-lucide="trending-up" class="w-3 h-3"></i> Potential revenue
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 3: Deals Won (This Month) -->
+          <div class="nova-card p-5 flex flex-col justify-between h-40">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-medium text-[#85858f]">Deals Won <span class="text-[10px] text-[#6b6c77]">(This Month)</span></span>
+              <span class="pill-badge pill-yellow">
+                <i data-lucide="trending-down" class="w-3 h-3"></i> vs last month
+              </span>
+            </div>
+            <div>
+              <h2 id="kpi-deals-won" class="text-4xl font-bold tracking-tight text-white font-sans">18</h2>
+              <span class="text-[11px] text-[#85858f] mt-1 block">+22% vs last month</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Conversion Rate -->
+          <div class="nova-card p-5 flex flex-col justify-between h-40 relative overflow-hidden">
+            <div>
+              <span class="text-xs font-medium text-[#85858f] block mb-1">Conversion Rate</span>
+              <h2 id="kpi-today-occupancy" class="text-4xl font-bold tracking-tight text-white font-sans">34%</h2>
+            </div>
+            <div class="flex items-end justify-between">
+              <span class="text-[11px] text-[#ef4444] font-medium">vs last month</span>
+              <!-- Red Trend Wave Sparkline -->
+              <div class="w-24 h-8">
+                <svg viewBox="0 0 100 35" class="w-full h-full overflow-visible">
+                  <path d="M0 25 C 20 28, 40 10, 60 22 C 75 32, 85 8, 100 14" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW SWITCHER SEGMENTED TABS (Toggle between Photo 1 & Photo 2 Views) -->
+        <div class="flex items-center justify-between pt-2">
+          <div class="flex items-center gap-1 bg-[#18191d] p-1 rounded-full border border-[rgba(255,255,255,0.06)]">
+            <button id="btn-toggle-view-photo1" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-[#26262d] text-white transition shadow-sm">
+              Sales & Activity (Photo 1)
+            </button>
+            <button id="btn-toggle-view-photo2" class="px-4 py-1.5 rounded-full text-xs font-semibold text-[#85858f] hover:text-white transition">
+              Revenue & Performance (Photo 2)
+            </button>
+          </div>
+          <span class="text-xs text-[#6b6c77] hidden md:block">Cinema telemetry & box office channels</span>
+        </div>
+
+        <!-- ================================================================ -->
+        <!-- PHOTO 1 MIDDLE ROW: Total Sales & Sales Activity (Semi-Donut)    -->
+        <!-- ================================================================ -->
+        <div id="middle-view-photo1" class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          
+          <!-- Left: Total Sales Line Chart (2 Cols) -->
+          <div class="lg:col-span-2 nova-card p-6 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-semibold text-white">Total Sales</span>
+              <span class="pill-badge pill-green">
+                <i data-lucide="trending-up" class="w-3 h-3"></i> $15,039
+              </span>
+            </div>
+            <div class="h-64 relative">
+              <canvas id="chart-total-sales"></canvas>
+            </div>
+          </div>
+
+          <!-- Right: Sales Activity Semi-Circle Gauge (1 Col) -->
+          <div class="nova-card p-6 flex flex-col justify-between items-center text-center">
+            <div class="w-full text-left mb-2">
+              <span class="text-sm font-semibold text-white">Sales Activity</span>
+            </div>
+
+            <!-- Semi-Circular Gauge Container -->
+            <div class="relative w-64 h-36 flex items-center justify-center my-2">
+              <svg viewBox="0 0 200 115" class="w-full h-full">
+                <!-- Arc Segments: Total 180 degrees -->
+                <!-- Segment 1: Yellow / Amber (30% = 54 deg) -->
+                <path d="M 20 100 A 80 80 0 0 1 52.9 35.1" fill="none" stroke="#fbbf24" stroke-width="26" stroke-linecap="butt"/>
+                <!-- Segment 2: Teal / Mint (60% = 108 deg) -->
+                <path d="M 52.9 35.1 A 80 80 0 0 1 176.1 75.3" fill="none" stroke="#2dd4bf" stroke-width="26" stroke-linecap="butt"/>
+                <!-- Segment 3: Purple / Lavender (10% = 18 deg) -->
+                <path d="M 176.1 75.3 A 80 80 0 0 1 180 100" fill="none" stroke="#818cf8" stroke-width="26" stroke-linecap="butt"/>
+                
+                <!-- Inner Cutout Circle for Donut Effect -->
+                <path class="gauge-inner-cutout" d="M 45 100 A 55 55 0 0 1 155 100" fill="#1c1c21"/>
+              </svg>
+
+              <!-- Percentage Floating Badges -->
+              <span class="absolute left-6 top-8 text-xs font-bold text-[#fbbf24]">30%</span>
+              <span class="absolute top-0 text-xs font-bold text-[#2dd4bf]">60%</span>
+              <span class="absolute right-3 top-16 text-xs font-bold text-[#818cf8]">10%</span>
+            </div>
+
+            <!-- 3 Bottom Channel Filter Pill Buttons -->
+            <div class="flex items-center gap-2 mt-4">
+              <button class="px-3.5 py-1.5 rounded-full text-xs font-medium pill-dark active" data-channel="whatsapp">
+                WhatsApp
+              </button>
+              <button class="px-3.5 py-1.5 rounded-full text-xs font-medium pill-dark" data-channel="chat">
+                Chat
+              </button>
+              <button class="px-3.5 py-1.5 rounded-full text-xs font-medium pill-dark" data-channel="email">
+                Email
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================================================================ -->
+        <!-- PHOTO 2 MIDDLE ROW: Closed Revenue, Deal Sources & Rep Performance -->
+        <!-- ================================================================ -->
+        <div id="middle-view-photo2" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-5">
+          
+          <!-- Card 1: Closed Revenue in last 30 days Area Wave -->
+          <div class="nova-card p-6 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-semibold text-white">Closed revenue in the last 30 days</span>
+            </div>
+            <div class="flex items-center justify-between text-xs mb-3">
+              <span class="text-[#85858f]">Won</span>
+              <span class="pill-badge pill-orange">
+                <i data-lucide="trending-up" class="w-3 h-3"></i> 68%
+              </span>
+            </div>
+            <!-- Smooth Bell Curve Area Chart with Apex Marker -->
+            <div class="h-48 relative">
+              <canvas id="chart-closed-revenue"></canvas>
+            </div>
+          </div>
+
+          <!-- Card 2: Top Deal Sources (Capsule Bars) -->
+          <div class="nova-card p-6 flex flex-col justify-between">
+            <div class="mb-4">
+              <span class="text-sm font-semibold text-white">Top Deal Sources</span>
+            </div>
+            <!-- 3 Vertical Capsule Bars with Y-axis percentages -->
+            <div class="flex items-end justify-between px-4 h-48">
+              <div class="text-[10px] text-[#6b6c77] flex flex-col justify-between h-36 font-mono">
+                <span>200%</span>
+                <span>150%</span>
+                <span>100%</span>
+                <span>50%</span>
+              </div>
+              <!-- Bar 1: Website (100%) -->
+              <div class="flex flex-col items-center gap-2">
+                <div class="capsule-bar-trough">
+                  <div class="capsule-bar-fill" style="height: 50%;"></div>
+                </div>
+                <span class="text-[11px] text-[#85858f]">Website</span>
+              </div>
+              <!-- Bar 2: Ads (160%) -->
+              <div class="flex flex-col items-center gap-2">
+                <div class="capsule-bar-trough">
+                  <div class="capsule-bar-fill" style="height: 85%;"></div>
+                </div>
+                <span class="text-[11px] text-[#85858f]">Ads</span>
+              </div>
+              <!-- Bar 3: Referrals (140%) -->
+              <div class="flex flex-col items-center gap-2">
+                <div class="capsule-bar-trough">
+                  <div class="capsule-bar-fill" style="height: 70%;"></div>
+                </div>
+                <span class="text-[11px] text-[#85858f]">Referrals</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Sales Rep Performance (Progress Rows) -->
+          <div class="nova-card p-6 flex flex-col justify-between">
+            <div class="mb-4">
+              <span class="text-sm font-semibold text-white">Sales Rep Performance</span>
+            </div>
+            <div class="space-y-5 my-auto">
+              <!-- Rep 1: Sarah -->
+              <div>
+                <div class="flex items-center justify-between text-xs mb-1.5">
+                  <div class="flex items-center gap-2">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80" class="w-6 h-6 rounded-full object-cover" />
+                    <span class="font-medium text-white">Sarah</span>
+                  </div>
+                  <span class="font-mono text-white text-xs font-semibold">$54,200</span>
+                </div>
+                <div class="w-full h-3 bg-[#26262c] rounded-full overflow-hidden p-0.5">
+                  <div class="h-full bg-novaOrange rounded-full" style="width: 82%;"></div>
+                </div>
+              </div>
+
+              <!-- Rep 2: John -->
+              <div>
+                <div class="flex items-center justify-between text-xs mb-1.5">
+                  <div class="flex items-center gap-2">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80" class="w-6 h-6 rounded-full object-cover" />
+                    <span class="font-medium text-white">John</span>
+                  </div>
+                  <span class="font-mono text-white text-xs font-semibold">$38,600</span>
+                </div>
+                <div class="w-full h-3 bg-[#26262c] rounded-full overflow-hidden p-0.5">
+                  <div class="h-full bg-novaOrange rounded-full" style="width: 58%;"></div>
+                </div>
+              </div>
+
+              <!-- Rep 3: Marcus -->
+              <div>
+                <div class="flex items-center justify-between text-xs mb-1.5">
+                  <div class="flex items-center gap-2">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" class="w-6 h-6 rounded-full object-cover" />
+                    <span class="font-medium text-white">Marcus</span>
+                  </div>
+                  <span class="font-mono text-white text-xs font-semibold">$45,100</span>
+                </div>
+                <div class="w-full h-3 bg-[#26262c] rounded-full overflow-hidden p-0.5">
+                  <div class="h-full bg-novaOrange rounded-full" style="width: 68%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================================================================ -->
+        <!-- BOTTOM DATA TABLE: 357 CONTACT / CRM BOOKINGS (PHOTO 1)          -->
+        <!-- ================================================================ -->
+        <div class="nova-card p-6 space-y-4">
+          
+          <!-- Table Header & Controls -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <span class="text-sm font-semibold text-white">357 Contact</span>
+            
+            <div class="flex flex-wrap items-center gap-3">
+              <!-- Search Candidates input with icon on left -->
+              <div class="relative">
+                <i data-lucide="search" class="w-3.5 h-3.5 text-[#6b6c77] absolute left-3 top-2.5 pointer-events-none"></i>
+                <input 
+                  type="text" 
+                  id="table-search-input" 
+                  placeholder="Search Candidates" 
+                  class="h-8 pl-8 pr-3 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white placeholder-[#6b6c77] focus:outline-none focus:border-novaOrange w-44 sm:w-48"
+                />
+              </div>
+
+              <!-- All Role Dropdown -->
+              <div class="relative">
+                <select id="table-role-filter" class="h-8 px-3 pr-7 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-[#85858f] focus:outline-none focus:border-novaOrange appearance-none">
+                  <option value="all">All Role</option>
+                  <option value="vip">VIP Patrons</option>
+                  <option value="corporate">Corporate Clients</option>
+                  <option value="member">Loyalty Members</option>
+                </select>
+                <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-[#6b6c77] absolute right-2.5 top-2.5 pointer-events-none"></i>
+              </div>
+
+              <!-- Last 30 Days Dropdown -->
+              <div class="relative">
+                <select id="table-date-filter" class="h-8 px-3 pr-7 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-[#85858f] focus:outline-none focus:border-novaOrange appearance-none">
+                  <option value="30">Last 30 Days</option>
+                  <option value="7">Last 7 Days</option>
+                  <option value="90">Last 90 Days</option>
+                </select>
+                <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-[#6b6c77] absolute right-2.5 top-2.5 pointer-events-none"></i>
+              </div>
+
+              <!-- Export Data Button with Tray Arrow Icon -->
+              <button id="btn-export-table-data" class="h-8 px-3 rounded-lg bg-[#222227] hover:bg-[#2b2b32] border border-[rgba(255,255,255,0.06)] text-xs text-[#85858f] hover:text-white transition flex items-center gap-1.5">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Export Data</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Data Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-[#85858f]">
+              <thead class="bg-[#242429] text-[#6b6c77] font-medium border-b border-[rgba(255,255,255,0.04)]">
+                <tr>
+                  <th class="py-3 px-4">Date</th>
+                  <th class="py-3 px-4">Name</th>
+                  <th class="py-3 px-4">Email</th>
+                  <th class="py-3 px-4">Company</th>
+                  <th class="py-3 px-4">Platform</th>
+                  <th class="py-3 px-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="overview-contacts-tbody" class="divide-y divide-[rgba(255,255,255,0.03)]">
+                <!-- Rendered dynamically from Store.getCustomers() -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Lead Card (From Photo 2 Bottom) -->
+          <div class="mt-4 pt-4 border-t border-[rgba(255,255,255,0.04)] flex items-center justify-between text-xs">
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 rounded bg-[#ff5d2a]/20 text-novaOrange flex items-center justify-center font-bold text-[10px]">
+                ■
+              </div>
+              <span class="font-semibold text-white">Pixel Studio</span>
+              <span class="text-[#6b6c77]">Warner Bros Film Group • Dune: Part Two IMAX Showcase</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="text-[#6b6c77] font-mono">...</span>
+              <span class="font-mono text-white font-bold">$4,500</span>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- VIEW 2: MOVIE & SHOWTIME SCHEDULER                                 -->
+      <!-- ================================================================== -->
+      <section id="view-movies" class="view-container hidden space-y-6 max-w-7xl mx-auto">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Movie Catalog & Auditorium Scheduling</h2>
+            <p class="text-xs text-[#85858f]">Manage film assets, operational statuses, and conflict-free showtime allocations</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="document.getElementById('quick-add-movie-btn').click()" class="px-4 py-2 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-semibold text-xs transition flex items-center gap-1.5 shadow-lg shadow-novaOrange/20">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Add Movie</span>
+            </button>
+            <button onclick="document.getElementById('quick-add-showtime-btn').click()" class="px-4 py-2 rounded-xl bg-[#222227] hover:bg-[#2c2c34] text-white border border-[rgba(255,255,255,0.08)] font-semibold text-xs transition flex items-center gap-1.5">
+              <i data-lucide="calendar-plus" class="w-4 h-4 text-novaOrange"></i>
+              <span>Schedule Showtime</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 1: Movies in Rotation -->
+        <div class="nova-card p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[rgba(255,255,255,0.05)] pb-3">
+            <div class="flex items-center gap-2">
+              <i data-lucide="film" class="w-4 h-4 text-novaOrange"></i>
+              <h3 class="font-semibold text-white text-sm">Active Film Rotation</h3>
+            </div>
+            <div class="flex items-center gap-3">
+              <input 
+                type="text" 
+                id="movie-search-filter" 
+                placeholder="Search movies by title or genre..." 
+                class="h-8 px-3 rounded-lg bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange w-56"
+              />
+              <div class="flex items-center bg-[#222227] p-0.5 rounded-lg border border-[rgba(255,255,255,0.06)]">
+                <button id="btn-movie-view-grid" class="p-1.5 rounded-md bg-[#2d2d35] text-novaOrange transition" title="Grid View">
+                  <i data-lucide="grid" class="w-3.5 h-3.5"></i>
+                </button>
+                <button id="btn-movie-view-table" class="p-1.5 rounded-md text-[#85858f] hover:text-white transition" title="Table View">
+                  <i data-lucide="list" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Movies Catalog Container -->
+          <div id="movies-catalog-container"></div>
+        </div>
+
+        <!-- Section 2: Showtime Allocations -->
+        <div class="nova-card p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[rgba(255,255,255,0.05)] pb-3">
+            <div class="flex items-center gap-2">
+              <i data-lucide="calendar" class="w-4 h-4 text-[#2dd4bf]"></i>
+              <h3 class="font-semibold text-white text-sm">Scheduled Showtimes & Availability</h3>
+            </div>
+            <!-- Screen Filter Tabs -->
+            <div class="flex items-center gap-1.5 text-xs">
+              <button class="tab-screen-filter px-3 py-1.5 rounded-lg bg-[#26262d] text-white font-medium active" data-screen="all">All Screens</button>
+              <button class="tab-screen-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-medium" data-screen="scr-1">Screen 1 (IMAX)</button>
+              <button class="tab-screen-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-medium" data-screen="scr-2">Screen 2 (Dolby)</button>
+              <button class="tab-screen-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-medium" data-screen="scr-3">Screen 3 (Luxe)</button>
+            </div>
+          </div>
+          <!-- Showtimes Schedule Container -->
+          <div id="showtimes-schedule-container"></div>
+        </div>
+
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- VIEW 3: BOX OFFICE & REAL-TIME SEAT MATRIX                         -->
+      <!-- ================================================================== -->
+      <section id="view-boxoffice" class="view-container hidden space-y-6 max-w-7xl mx-auto">
+        
+        <!-- Showtime Selector Bar -->
+        <div class="nova-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <img id="bo-movie-poster" src="" class="w-12 h-16 rounded-xl object-cover shadow-md flex-shrink-0 bg-[#222227]" alt="Poster" />
+            <div>
+              <span class="text-[10px] text-novaOrange font-bold uppercase tracking-wider block">Active Box Office Screening</span>
+              <h2 id="bo-movie-title" class="text-base font-bold text-white">Select a Screening</h2>
+              <p id="bo-movie-meta" class="text-xs text-[#85858f] mt-0.5">Please choose a screening slot</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <label class="text-xs font-semibold text-[#85858f] flex-shrink-0">Choose Showtime:</label>
+            <select id="boxoffice-showtime-select" class="h-9 px-3.5 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.08)] text-xs text-white focus:outline-none focus:border-novaOrange font-medium">
+            </select>
+          </div>
+        </div>
+
+        <!-- Seat Matrix Visualizer + Checkout Split -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          
+          <!-- Auditorium Canvas (2 Cols) -->
+          <div class="lg:col-span-2 nova-card p-6 flex flex-col items-center relative overflow-hidden">
+            
+            <!-- Curved Screen with Light Beam -->
+            <div class="w-full max-w-lg mb-8 screen-projection-beam pt-4 pb-6 px-8 rounded-2xl flex flex-col items-center">
+              <div class="w-full cinema-curved-screen"></div>
+              <span class="text-[10px] font-bold text-novaOrange tracking-widest uppercase mt-3 drop-shadow">
+                [ CINEMA PROJECTION SOUNDSTAGE ]
+              </span>
+            </div>
+
+            <!-- Seat Matrix Interactive Grid -->
+            <div id="seat-matrix-container" class="w-full overflow-x-auto py-2 flex justify-center"></div>
+
+            <!-- Seat Status Legend -->
+            <div class="w-full mt-8 pt-4 border-t border-[rgba(255,255,255,0.05)] flex flex-wrap items-center justify-around gap-3 text-xs text-[#85858f]">
+              <div class="flex items-center gap-2">
+                <span class="w-4 h-4 rounded bg-[#232238] border border-[#6366f1]"></span>
+                <span>VIP Recliner ($22)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-4 h-4 rounded bg-[#232328] border border-[rgba(255,255,255,0.12)]"></span>
+                <span>Standard ($16.50)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-4 h-4 rounded bg-[#172a2e] border border-[#14b8a6]"></span>
+                <span>Accessible ($15)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-4 h-4 rounded bg-novaOrange border border-[#ffbe98]"></span>
+                <span class="font-semibold text-novaOrange">Selected</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-4 h-4 rounded bg-[#16171b] border border-[rgba(255,255,255,0.04)] opacity-60"></span>
+                <span>Occupied</span>
+              </div>
+            </div>
+
+            <!-- Live Auditorium Statistics Pill Bar -->
+            <div class="w-full mt-4 flex items-center justify-between text-xs px-4 py-2.5 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.05)]">
+              <span class="text-[#85858f]">Available: <strong id="matrix-count-available" class="text-[#4ade80]">0</strong></span>
+              <span class="text-[#85858f]">Booked: <strong id="matrix-count-booked" class="text-white">0</strong></span>
+              <span class="text-[#85858f]">Selected: <strong id="matrix-count-selected" class="text-novaOrange">0</strong></span>
+            </div>
+
+          </div>
+
+          <!-- Admin Booking & Checkout Panel (1 Col) -->
+          <div class="nova-card p-6 flex flex-col space-y-4">
+            
+            <div class="border-b border-[rgba(255,255,255,0.05)] pb-3 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="shopping-cart" class="w-4 h-4 text-novaOrange"></i>
+                <h3 class="font-bold text-white text-sm">Box Office Cart</h3>
+              </div>
+              <span class="text-[10px] font-mono text-[#85858f]">Terminal A</span>
+            </div>
+
+            <!-- Selected Seats List -->
+            <div>
+              <span class="text-xs font-semibold text-[#85858f] block mb-2">Selected Seats</span>
+              <div id="selected-seats-list" class="space-y-1.5 max-h-48 overflow-y-auto"></div>
+            </div>
+
+            <!-- Customer Assignment Dropdown -->
+            <div>
+              <label class="block text-xs font-semibold text-[#85858f] mb-1.5">Assign to Customer (CRM)</label>
+              <select id="drawer-customer-select" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.08)] text-xs text-white focus:outline-none focus:border-novaOrange font-medium">
+              </select>
+            </div>
+
+            <!-- Payment Method -->
+            <div>
+              <label class="block text-xs font-semibold text-[#85858f] mb-1.5">Payment Method</label>
+              <select id="drawer-payment-method" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.08)] text-xs text-white focus:outline-none focus:border-novaOrange font-medium">
+                <option value="Credit Card">Credit Card (POS Terminal)</option>
+                <option value="Cash">Cash (Desk Drawer)</option>
+                <option value="Apple Pay">Apple Pay / Contactless</option>
+                <option value="UPI / QR">UPI / Digital QR</option>
+              </select>
+            </div>
+
+            <!-- Price Breakdown Calculation -->
+            <div class="p-4 rounded-xl bg-[#17181c] border border-[rgba(255,255,255,0.05)] space-y-2 text-xs">
+              <div class="flex justify-between text-[#85858f]">
+                <span>Subtotal</span>
+                <span id="drawer-subtotal" class="font-mono text-white">$0.00</span>
+              </div>
+              <div class="flex justify-between text-[#85858f]">
+                <span>Facility / Booking Fee</span>
+                <span id="drawer-fee" class="font-mono text-white">$0.00</span>
+              </div>
+              <div class="flex justify-between text-[#85858f]">
+                <span>Tax (8.5%)</span>
+                <span id="drawer-tax" class="font-mono text-white">$0.00</span>
+              </div>
+              <div class="flex justify-between text-sm font-bold text-white pt-2 border-t border-[rgba(255,255,255,0.06)]">
+                <span>Total Due</span>
+                <span id="drawer-total" class="font-mono text-novaOrange font-bold text-base">$0.00</span>
+              </div>
+            </div>
+
+            <!-- Confirm & Print Button -->
+            <button id="btn-confirm-booking" disabled class="w-full py-3 rounded-xl bg-novaOrange hover:bg-novaOrange-hover disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-novaOrange/20">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span>Confirm & Issue Tickets</span>
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- VIEW 4: CUSTOMER CRM & LOYALTY MANAGEMENT                          -->
+      <!-- ================================================================== -->
+      <section id="view-crm" class="view-container hidden space-y-6 max-w-7xl mx-auto">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Customer CRM & Loyalty Directory</h2>
+            <p class="text-xs text-[#85858f]">Patron profiles, tiered loyalty points, visit histories, and box office staff notes</p>
+          </div>
+          <button onclick="document.getElementById('quick-add-customer-btn').click()" class="px-4 py-2 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-semibold text-xs transition flex items-center gap-1.5 self-start sm:self-auto shadow-lg shadow-novaOrange/20">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
+            <span>Register Customer</span>
+          </button>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="nova-card p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="relative w-full md:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-[#6b6c77] absolute left-3 top-2.5"></i>
+            <input 
+              type="text" 
+              id="crm-search-filter" 
+              placeholder="Search by patron name, email, or phone..." 
+              class="w-full h-9 pl-9 pr-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange"
+            />
+          </div>
+
+          <!-- Tier Filter Tabs -->
+          <div class="flex items-center gap-1.5 text-xs overflow-x-auto pb-1 md:pb-0">
+            <button class="tab-tier-filter px-3 py-1.5 rounded-lg bg-[#26262d] text-white font-semibold active" data-tier="all">All Tiers</button>
+            <button class="tab-tier-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-tier="platinum">Platinum</button>
+            <button class="tab-tier-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-tier="gold">Gold</button>
+            <button class="tab-tier-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-tier="silver">Silver</button>
+            <button class="tab-tier-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-tier="bronze">Bronze</button>
+          </div>
+        </div>
+
+        <!-- Customer CRM Data Table -->
+        <div class="nova-card overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-[#85858f]">
+              <thead class="bg-[#242429] text-[#6b6c77] font-medium border-b border-[rgba(255,255,255,0.04)] uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th class="py-3 px-4">Patron Name</th>
+                  <th class="py-3 px-4">Phone</th>
+                  <th class="py-3 px-4">Loyalty Tier</th>
+                  <th class="py-3 px-4">Visits</th>
+                  <th class="py-3 px-4">Lifetime Spend</th>
+                  <th class="py-3 px-4">Reward Points</th>
+                  <th class="py-3 px-4">Last Visit</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="customer-crm-tbody" class="divide-y divide-[rgba(255,255,255,0.04)]"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- VIEW 5: RESERVATIONS & REFUND DESK                                 -->
+      <!-- ================================================================== -->
+      <section id="view-reservations" class="view-container hidden space-y-6 max-w-7xl mx-auto">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Reservations Ledger & Refund Desk</h2>
+            <p class="text-xs text-[#85858f]">Complete transaction records, seat allocations, digital pass re-issuance, and one-click refund desk</p>
+          </div>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="nova-card p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="relative w-full md:w-80">
+            <i data-lucide="search" class="w-4 h-4 text-[#6b6c77] absolute left-3 top-2.5"></i>
+            <input 
+              type="text" 
+              id="reservation-search-filter" 
+              placeholder="Search by CP-XXXX, customer name, movie, seat..." 
+              class="w-full h-9 pl-9 pr-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange"
+            />
+          </div>
+
+          <!-- Status Filter Tabs -->
+          <div class="flex items-center gap-1.5 text-xs">
+            <button class="tab-res-filter px-3 py-1.5 rounded-lg bg-[#26262d] text-white font-semibold active" data-status="all">All Transactions</button>
+            <button class="tab-res-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-status="confirmed">Confirmed</button>
+            <button class="tab-res-filter px-3 py-1.5 rounded-lg hover:bg-[#222227] text-[#85858f] font-semibold" data-status="refunded">Refunded / Cancelled</button>
+          </div>
+        </div>
+
+        <!-- Reservations Ledger Table -->
+        <div class="nova-card overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-[#85858f]">
+              <thead class="bg-[#242429] text-[#6b6c77] font-medium border-b border-[rgba(255,255,255,0.04)] uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th class="py-3 px-4">Booking ID</th>
+                  <th class="py-3 px-4">Patron Name</th>
+                  <th class="py-3 px-4">Movie Title</th>
+                  <th class="py-3 px-4">Screen & Slot</th>
+                  <th class="py-3 px-4">Allocated Seats</th>
+                  <th class="py-3 px-4">Amount</th>
+                  <th class="py-3 px-4">Payment</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="reservations-ledger-tbody" class="divide-y divide-[rgba(255,255,255,0.04)]"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- VIEW 6: SETTINGS & SYSTEM DATA MANAGEMENT                          -->
+      <!-- ================================================================== -->
+      <section id="view-settings" class="view-container hidden space-y-6 max-w-7xl mx-auto">
+        
+        <div>
+          <h2 class="text-xl font-bold text-white">System Data, Backup & Theater Settings</h2>
+          <p class="text-xs text-[#85858f]">Configure theater parameters, pricing taxes, active operator, and export/restore database state</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Cinema Configuration Form -->
+          <div class="lg:col-span-2 nova-card p-6 space-y-4">
+            <h3 class="font-bold text-white text-sm pb-2 border-b border-[rgba(255,255,255,0.05)] flex items-center gap-2">
+              <i data-lucide="sliders" class="w-4 h-4 text-novaOrange"></i>
+              <span>Theater Operational Configuration</span>
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-[#85858f] mb-1">Cinema Chain Name</label>
+                <input type="text" id="setting-cinema-name" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#85858f] mb-1">Hall / Complex Location</label>
+                <input type="text" id="setting-cinema-location" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#85858f] mb-1">Currency Symbol</label>
+                <input type="text" id="setting-currency" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#85858f] mb-1">Default Ticket Tax Rate (%)</label>
+                <input type="number" step="0.1" id="setting-tax-rate" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#85858f] mb-1">Booking Convenience Fee ($)</label>
+                <input type="number" step="0.25" id="setting-booking-fee" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#85858f] mb-1">Active Box Office Lead Operator</label>
+                <input type="text" id="setting-active-staff" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-[rgba(255,255,255,0.05)] flex justify-end">
+              <button id="btn-save-settings" class="px-5 py-2.5 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-bold text-xs transition shadow-lg shadow-novaOrange/20">
+                Save Configurations
+              </button>
+            </div>
+          </div>
+
+          <!-- Backup & Recovery Utilities -->
+          <div class="nova-card p-6 flex flex-col justify-between space-y-5">
+            <div>
+              <h3 class="font-bold text-white text-sm pb-2 border-b border-[rgba(255,255,255,0.05)] flex items-center gap-2">
+                <i data-lucide="database" class="w-4 h-4 text-[#2dd4bf]"></i>
+                <span>Database Backup & Diagnostics</span>
+              </h3>
+
+              <div class="p-4 rounded-xl bg-[#17181c] border border-[rgba(255,255,255,0.05)] my-4 space-y-2.5 text-xs">
+                <div class="flex justify-between">
+                  <span class="text-[#85858f]">Database Engine:</span>
+                  <span class="font-mono text-white">Browser LocalStorage</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#85858f]">Storage Footprint:</span>
+                  <span id="diag-storage-size" class="font-mono text-[#2dd4bf] font-bold">0 KB</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#85858f]">Total Records:</span>
+                  <span id="diag-total-records" class="font-mono text-white">0 records</span>
+                </div>
+              </div>
+
+              <div class="space-y-2.5">
+                <button id="btn-export-backup" class="w-full py-2.5 px-3 rounded-xl bg-[#222227] hover:bg-[#2b2b32] text-white font-semibold text-xs transition flex items-center justify-center gap-2">
+                  <i data-lucide="download" class="w-4 h-4 text-novaOrange"></i>
+                  <span>Export Database (JSON Backup)</span>
+                </button>
+
+                <button id="btn-import-backup" class="w-full py-2.5 px-3 rounded-xl bg-[#222227] hover:bg-[#2b2b32] text-white font-semibold text-xs transition flex items-center justify-center gap-2">
+                  <i data-lucide="upload" class="w-4 h-4 text-[#2dd4bf]"></i>
+                  <span>Restore from JSON File</span>
+                </button>
+                <input type="file" id="import-file-input" accept=".json" class="hidden" />
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-[rgba(255,255,255,0.05)]">
+              <button id="btn-reset-demo-data" class="w-full py-2.5 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-semibold text-xs transition flex items-center justify-center gap-2">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                <span>Reset to Sample Demo Data</span>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- SLIDE-OVER DRAWER: CUSTOMER CRM INSPECTOR                              -->
+  <!-- ====================================================================== -->
+  <div id="customer-drawer" class="hidden fixed inset-0 z-50 overflow-hidden">
+    <div class="absolute inset-0 drawer-backdrop" onclick="document.getElementById('customer-drawer').classList.add('hidden')"></div>
+    <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
+      <div id="customer-drawer-content" class="w-screen max-w-md bg-[#18191e] border-l border-[rgba(255,255,255,0.08)] shadow-2xl flex flex-col slide-in-right overflow-y-auto"></div>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- MODAL: DIGITAL TICKET STUB PREVIEW & PRINTING                          -->
+  <!-- ====================================================================== -->
+  <div id="ticket-stub-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 drawer-backdrop" onclick="document.getElementById('ticket-stub-modal').classList.add('hidden')"></div>
+    <div class="relative bg-transparent z-10 w-full max-w-md fade-in-scale">
+      <div id="ticket-stub-content" class="mb-4"></div>
+      
+      <div class="flex items-center justify-center gap-3">
+        <button id="btn-print-ticket" class="px-5 py-2.5 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white font-bold text-xs transition flex items-center gap-2 shadow-lg shadow-novaOrange/20">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Print Physical Ticket</span>
+        </button>
+        <button id="btn-close-ticket-modal" class="px-4 py-2.5 rounded-xl bg-[#222227] hover:bg-[#2c2c34] text-white font-semibold text-xs transition">
+          Close Window
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- MODAL: ADD / EDIT MOVIE                                                -->
+  <!-- ====================================================================== -->
+  <div id="modal-movie-form" class="modal-wrapper hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 drawer-backdrop modal-dismiss-btn"></div>
+    <div class="relative bg-[#1c1c21] border border-[rgba(255,255,255,0.08)] shadow-2xl rounded-2xl w-full max-w-lg z-10 p-6 fade-in-scale">
+      <div class="flex items-center justify-between pb-3 border-b border-[rgba(255,255,255,0.06)] mb-4">
+        <h3 id="modal-movie-title" class="font-bold text-white text-base">Add New Movie</h3>
+        <button class="modal-dismiss-btn text-[#85858f] hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-movie" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Movie Title *</label>
+          <input type="text" id="movie-input-title" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="e.g. Dune: Part Two" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-[#85858f] mb-1">Genre *</label>
+            <input type="text" id="movie-input-genre" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="e.g. Sci-Fi / Drama" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#85858f] mb-1">Duration (Minutes) *</label>
+            <input type="number" id="movie-input-duration" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="165" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-[#85858f] mb-1">Age Rating</label>
+            <select id="movie-input-rating" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange">
+              <option value="PG-13">PG-13</option>
+              <option value="R">R</option>
+              <option value="PG">PG</option>
+              <option value="G">G</option>
+              <option value="NC-17">NC-17</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#85858f] mb-1">Base Ticket Price ($) *</label>
+            <input type="number" step="0.5" id="movie-input-price" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="16.50" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Poster Image URL</label>
+          <input type="url" id="movie-input-poster" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="https://..." />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-[#85858f] mb-1">Director</label>
+            <input type="text" id="movie-input-director" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="Denis Villeneuve" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#85858f] mb-1">Status</label>
+            <select id="movie-input-status" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange">
+              <option value="Active">Active Rotation</option>
+              <option value="Coming Soon">Coming Soon</option>
+              <option value="Archived">Archived</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Synopsis</label>
+          <textarea id="movie-input-synopsis" rows="2" class="w-full p-2.5 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="Short description..."></textarea>
+        </div>
+
+        <div class="pt-3 border-t border-[rgba(255,255,255,0.06)] flex justify-end gap-2">
+          <button type="button" class="modal-dismiss-btn px-4 py-2 rounded-xl bg-[#222227] hover:bg-[#2c2c34] text-[#85858f] hover:text-white text-xs font-semibold">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white text-xs font-bold transition">Save Movie</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- MODAL: ADD SHOWTIME WITH REAL-TIME CONFLICT DETECTOR                   -->
+  <!-- ====================================================================== -->
+  <div id="modal-showtime-form" class="modal-wrapper hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 drawer-backdrop modal-dismiss-btn"></div>
+    <div class="relative bg-[#1c1c21] border border-[rgba(255,255,255,0.08)] shadow-2xl rounded-2xl w-full max-w-lg z-10 p-6 fade-in-scale">
+      <div class="flex items-center justify-between pb-3 border-b border-[rgba(255,255,255,0.06)] mb-4">
+        <h3 class="font-bold text-white text-base">Schedule New Showtime</h3>
+        <button class="modal-dismiss-btn text-[#85858f] hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Real-time Conflict Alert Box -->
+      <div id="st-conflict-alert" class="hidden mb-3 p-3 rounded-xl bg-rose-500/15 border border-rose-500/40 text-xs text-rose-300 font-medium"></div>
+
+      <form id="form-showtime" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Allocated Movie *</label>
+          <select id="st-input-movie" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange font-medium"></select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Auditorium / Screen *</label>
+          <select id="st-input-screen" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange font-medium"></select>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-[#85858f] mb-1">Date *</label>
+            <input type="date" id="st-input-date" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#85858f] mb-1">Start Time *</label>
+            <input type="time" id="st-input-start" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-[#85858f] mb-1">Calculated End</label>
+            <input type="time" id="st-input-end" readonly class="w-full h-9 px-3 rounded-xl bg-[#17181c] border border-[rgba(255,255,255,0.06)] text-xs text-[#85858f] font-mono" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Pricing Multiplier (Peak / IMAX)</label>
+          <select id="st-input-multiplier" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange font-medium">
+            <option value="1.0">1.0x (Standard Base Price)</option>
+            <option value="1.1">1.1x (Evening Peak +10%)</option>
+            <option value="1.15">1.15x (IMAX Laser Premium +15%)</option>
+            <option value="1.2">1.2x (VIP Weekend Showcase +20%)</option>
+          </select>
+        </div>
+
+        <div class="pt-3 border-t border-[rgba(255,255,255,0.06)] flex justify-end gap-2">
+          <button type="button" class="modal-dismiss-btn px-4 py-2 rounded-xl bg-[#222227] hover:bg-[#2c2c34] text-[#85858f] hover:text-white text-xs font-semibold">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white text-xs font-bold transition">Confirm Showtime</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- MODAL: REGISTER / ADD CRM CUSTOMER                                     -->
+  <!-- ====================================================================== -->
+  <div id="modal-customer-form" class="modal-wrapper hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 drawer-backdrop modal-dismiss-btn"></div>
+    <div class="relative bg-[#1c1c21] border border-[rgba(255,255,255,0.08)] shadow-2xl rounded-2xl w-full max-w-md z-10 p-6 fade-in-scale">
+      <div class="flex items-center justify-between pb-3 border-b border-[rgba(255,255,255,0.06)] mb-4">
+        <h3 class="font-bold text-white text-base">Enroll New CRM Member</h3>
+        <button class="modal-dismiss-btn text-[#85858f] hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-customer" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Full Name *</label>
+          <input type="text" id="cust-input-name" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="e.g. Theresa Webb" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Email Address *</label>
+          <input type="email" id="cust-input-email" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="theresa.henry@gawe.com" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Phone Number *</label>
+          <input type="tel" id="cust-input-phone" required class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="+1 (555) 000-0000" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Initial Loyalty Tier</label>
+          <select id="cust-input-tier" class="w-full h-9 px-3 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange">
+            <option value="Bronze">Bronze (Standard Member)</option>
+            <option value="Silver">Silver (Frequent Patron)</option>
+            <option value="Gold">Gold (VIP Cinephile)</option>
+            <option value="Platinum">Platinum (Executive Member)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[#85858f] mb-1">Staff Notes / Company / Preferences</label>
+          <textarea id="cust-input-notes" rows="2" class="w-full p-2.5 rounded-xl bg-[#222227] border border-[rgba(255,255,255,0.06)] text-xs text-white focus:outline-none focus:border-novaOrange" placeholder="Company affiliation, seat preferences..."></textarea>
+        </div>
+
+        <div class="pt-3 border-t border-[rgba(255,255,255,0.06)] flex justify-end gap-2">
+          <button type="button" class="modal-dismiss-btn px-4 py-2 rounded-xl bg-[#222227] hover:bg-[#2c2c34] text-[#85858f] hover:text-white text-xs font-semibold">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-novaOrange hover:bg-novaOrange-hover text-white text-xs font-bold transition">Register Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- MODAL: REFUND CONFIRMATION & SEAT RELEASE                              -->
+  <!-- ====================================================================== -->
+  <div id="refund-confirmation-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 drawer-backdrop" id="btn-close-refund-modal"></div>
+    <div class="relative bg-[#1c1c21] border border-[rgba(255,255,255,0.08)] shadow-2xl rounded-2xl w-full max-w-md z-10 p-6 fade-in-scale">
+      <div class="flex items-center gap-3 pb-3 border-b border-[rgba(255,255,255,0.06)] mb-3 text-rose-400">
+        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+        <h3 class="font-bold text-white text-base">Issue Refund & Release Seats</h3>
+      </div>
+      <div id="refund-modal-details"></div>
+      <div class="pt-4 border-t border-[rgba(255,255,255,0.06)] flex justify-end gap-2 mt-4">
+        <button type="button" onclick="document.getElementById('refund-confirmation-modal').classList.add('hidden')" class="px-4 py-2 rounded-xl bg-[#222227] hover:bg-[#2c2c34] text-[#85858f] hover:text-white text-xs font-semibold">Keep Booking</button>
+        <button id="btn-confirm-refund-action" class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-lg shadow-rose-600/20">
+          Confirm Refund & Release
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- TOAST NOTIFICATION CONTAINER                                           -->
+  <!-- ====================================================================== -->
+  <div id="toast-notifications-container" class="fixed bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- Scripts -->
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
